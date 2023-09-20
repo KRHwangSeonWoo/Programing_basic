@@ -1,0 +1,657 @@
+[구조체]
+
+
+
+1. 구조체 개요
+
+
+(1) 구조체의 선언
+
+C 언어에서는 구조체 내부에 직접 함수를 정의하는 것은 허용되지 않습니다. 구조체는 데이터를 그룹화하는 용도로만 사용되며, 
+멤버 변수들만을 가질 수 있습니다. 함수는 구조체의 멤버로 직접 정의할 수 없습니다.
+
+하지만 C++과 같은 객체지향 프로그래밍 언어에서는 구조체를 클래스로 대체하여 클래스 멤버 함수를 구현할 수 있습니다. 
+클래스는 구조체와 유사하며, 추가적으로 멤버 함수와 접근 제어 지시자를 가질 수 있습니다.
+
+#######################################################################################################################################
+#include <stdio.h>
+
+//구조체의 선언, main 함수 안에서도 가능함.
+//s1, s2처럼 선언과 동시에 구조체 변수를 만들 수 있다.
+struct stduent {
+	int age;
+	char name[30];
+	//char name[]; -> 에러 발생
+
+}s1, s2;
+
+
+
+int main() {
+	//구조체 변수 생성 및 초기화
+	struct stduent s3 = { 25, "황선우" };
+
+	struct student s4;
+
+	s1 = { 10, "으쨋\n" };
+	s2 = { 20, "을깔라\n" };
+
+	printf("%s", s1.name);
+	printf("%s", s2.name);
+	
+	//구조체 변수끼리 값을 대입할 수 있음.
+	s1 = s2;
+	printf("%s\n", s1.name);
+/*
+으쨋
+을깔라
+을깔라
+*/
+}
+#######################################################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(2) typedef를 통한 구조체 사용
+구조체 변수의 이름이 길기에 typedef을 이용하여 간소화 가능하다. 
+#######################################################################################################################################
+#include <stdio.h>
+
+//구조체의 선언, main 함수 안에서도 가능함.
+//s1, s2처럼 선언과 동시에 구조체 변수를 만들 수 있다.
+typedef struct {
+	int age;
+	char name[30];
+	//char name[]; -> 에러 발생
+
+}STUD;
+
+
+
+int main() {
+
+
+	STUD s1 = { 20, "hwang" };
+	printf("%s", s1.name);
+	//hwang
+
+}
+#######################################################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. 구조체와 포인터
+
+
+(1) 구조체 포인터 변수 선언
+struct [구조체명] [*포인터명];
+->
+struct student *ptr;
+ptr = &s1;
+#######################################################################################################################################
+#include <stdio.h>
+
+struct student {
+	int age;
+	char name[30];
+
+}s3;
+
+
+
+int main() {
+
+	struct student s1 = { 20, "hwang" };
+	
+	struct student* ptr;
+	ptr = &s1;
+
+	printf("%s", *ptr->name);
+	//hwang
+
+	printf("%s", (*ptr).name);
+	//printf("%s", *ptr.name); -> 에러, 점연산자가 *연산자보다 우선순위가 높기에 *(ptr.name)으로 해석되어 오류가 발생함.
+	//hwang
+}
+#######################################################################################################################################
+
+
+
+
+
+
+
+
+
+(2) 구조체를 위한 동적 기억장소 할당
+#######################################################################################################################################
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+
+struct student {
+	int age;
+	char name[30];
+
+}s1;
+
+
+
+int main() {
+	s1 = { 20, "hwang" };
+	
+	struct student* ptr = &s1;
+
+	printf("%p\n", ptr->name);
+	//00007FF6CA43D714	
+
+	strcpy((*ptr).name, "jun");
+	printf("%p\n", ptr->name);
+	//*ptr->name = "lee"; -> 에러
+	//00007FF6CA43D714 -> 문자열의 주소를 바꾼 것이 아닌, 값을 복사해서 줌
+	/*문자열 복사는 결국 문자열의 각 요소(문자)를 하나하나 복사하여 다른 메모리 영역에 저장하는 작업입니다.*/
+	
+	ptr = (struct student*)malloc(sizeof(struct student));
+	printf("%p", ptr->name);
+	//00000213750F98F4 -> 주소값이 바뀜
+
+	/* 
+	*ptr->name = "kim"; -> 선언된 배열은 값을 다시 초기화할 수 없음
+	
+	ptr->name = "kim"은 문자열을 복사하는 것이 아니라, 문자열의 주소를 바꾸는 것입니다. 
+	C 언어에서 배열은 포인터 상수로 간주되기 때문에 배열에 문자열을 대입할 때는 
+	해당 배열의 주소를 변경하는 것이라고 볼 수 있습니다.
+
+	하지만, name은 struct student의 배열 멤버이며 문자열을 저장하는 공간으로 사용됩니다. 
+	따라서 직접적인 주소 변경은 안전하지 않을 수 있습니다. 문자열을 대입할 때에는 문자열을 복사하는 함수인 
+	strcpy를 사용하는 것이 바람직합니다.
+	
+	*/
+
+	char a[] = "hi";
+	char* ptr2 = a;
+
+
+
+	printf("%s", s1.name);
+
+
+}
+#######################################################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3. 함수와 구조체
+
+
+(1) 구조체 매개변수
+함수에서 구조체로 매개변수로 사용할 때 아래 2가지 방법이있다.
+
+1. 구조체 자체를 매개변수로 전달
+2. 구조체 포인터를 매개변수로 전달
+#######################################################################################################################################
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+
+struct student {
+	int age;
+	char name[30];
+
+};
+
+void print_student_info(struct student s) {
+	printf("%s, %d", s.name, s.age);
+}
+
+void print_student_info2(struct student* s) {
+	printf("%s, %d", (*s).name, (*s).age);
+	//printf("%s, %d", *s.name, *s.age); -> 에러
+
+}
+
+
+
+int main() {
+
+	struct student s1 = { 20, "hwang" };
+
+	print_student_info(s1);
+	//hwang, 20
+
+	student* ptr = &s1;
+
+	print_student_info2(ptr);
+	print_student_info2(&s1);
+	//print_student_info(*ptr); -> 에러
+	//print_student_info(s1); -> 에러 
+	//hwang, 20
+
+}
+#######################################################################################################################################
+
+
+
+
+
+
+
+
+(2) 구조체의 반환
+1. 구조체를 반환할 수 있다.
+2. 구조체의 주소를 반환할 수 있다.
+#######################################################################################################################################
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+
+struct student {
+	int age;
+	char name[30];
+
+};
+
+struct student return_s1(struct student s1) {
+
+	strcpy(s1.name, "으짤랴");
+	
+	return s1;
+
+}
+
+/* 에러 발생 
+
+struct student* return_s1(struct student s1) {
+	strcpy(s1.name, "으낑짱~");
+	struct student* ptr = &s1;
+	return *ptr;
+}
+*/
+
+struct student* return_s2(struct student s1) {
+	strcpy(s1.name, "kim");
+	struct student *ptr = &s1;
+	ptr = (struct student*) malloc(sizeof(s1));
+	//매개변수로 받은 "hwang"의 "값"(주소값이 아님)을 가지고 있는 s1이 새로 메모리를 할당 받아
+	//s1은 아무런 값을 가지고 있지않음
+	return ptr;
+}
+
+struct student* return_3(struct student s1) {
+	strcpy(s1.name, "lee");
+	struct student* ptr = &s1;
+	//return *ptr; -> 에러
+	return ptr;
+
+}
+
+
+
+
+
+int main() {
+
+	struct student hwang = { 24, "hwang" };
+	struct student * ptr = &hwang;
+
+	printf("%s\n", return_s1(hwang).name);
+
+	printf("%s\n", (*return_s2(hwang)).name);
+	//袴袴袴袴袴袴袴袴袴袴袴袴袴袴袴袴羲羲s뙹C
+	//printf("%s", *return_s2(hwang).name); -> 에러
+
+	printf("%s\n", (*return_3(hwang)).name);
+	//lee
+	//printf("%s", *return_s3(hwang).name); -> 에러, printf("%s", *(return_s3(hwang).name));와 같음.
+
+}
+#######################################################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4. 구조체 배열과 포인터 배열
+
+
+
+
+
+
+(1) 구조체 배열의 선언
+struct stduent a[3] = {s1, s2, s3};
+
+############################################################################################################################################
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+struct student {
+	int age;
+	char name[10];
+};
+struct student1 {
+	int age;
+	int age2;
+};
+
+int main() {
+
+	struct student s1 = { 20, "hwang"};
+	struct student s2 = { 20, "kim" };
+	struct student s3 = { 20, "yang" };
+
+	/* 실행 시 에러 발생
+	struct student s1 = { 21, "kim" }; -> 구조체도 초기화는 딱 한번만! (문자열 상관 없이(배열 상관없이) -> 정수도 포함)
+	struct student s1 = { 20, "han" };
+	*/
+
+
+	struct student1 s5 = { 20, 30 };
+	//struct student1 s5 = { 20, 30 }; -> 에러
+
+	struct student s4[3] = { s1, s2, s3 };
+
+	printf("%s", s4[0].name);
+	//hwang
+	
+}
+############################################################################################################################################
+
+
+
+
+
+
+
+
+
+
+(2) 구조체 포인터
+struct student* ptr[3] = { &s1, &s2, &s3 }; 이런 식으로 구조체의 주소값을 받아온다.
+############################################################################################################################################
+
+	#include <stdio.h>
+	#include <string.h>
+	#include <stdlib.h>
+
+
+	struct student {
+		int age;
+		char name[10];
+	};
+
+	int main() {
+		/*
+		
+		*/
+		struct student s1 = { 20, "hwang"};
+		struct student s2 = { 20, "kim" };
+		struct student s3 = { 20, "yang" };
+
+		struct student* ptr[3] = { &s1, &s2, &s3 };
+
+		printf("%s", ptr[0]->name);
+		//hwang
+
+		printf("%s", (*ptr[0]).name);
+		//hwang
+
+		//printf("%s", *(ptr[0]).name); -> 에러
+		//hwang
+
+	}
+
+############################################################################################################################################
+
+
+
+
+
+
+5. 중첩 구조체
+1) 일반적인 중첩 구조체: struct student s1 = { {20,"lee"}, 10 };
+2) 중첩 구조체 안에 포인터가 있을 경우
+############################################################################################################################################
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+
+struct information {
+	int age;
+	char name[20];
+};
+
+struct student {
+	information info;
+	int id;
+};
+
+
+struct student_ptr {
+	information *info;
+	int id;
+};
+
+
+int main() {
+
+	//**************일반적*****************
+	struct student s1 = { {20,"lee"}, 10 };
+	printf("%s", s1.info.name);
+	//lee
+
+	struct student* ptr = &s1;
+	printf("%s", (*ptr).info.name);
+	//lee
+	
+
+	
+
+	//**********************중첩 구조체 안에 포인터가 있을 경우**********************
+	struct information s2 = { 20, "hwang" };
+	struct student_ptr s3 = { {&s2} , 300 };
+	printf("%s", s3.info->name);
+	//hwang
+	printf("%s", (*s3.info).name); //****************************헷갈리는 문법************************
+	//s3.info가 가르키는 구조체에 접근하고 name 멤버에 접근
+	//hwang
+}
+############################################################################################################################################
+
+
+
+
+
+
+
+
+6. 공용체 
+공용체는 메모리를 공유하기에 마지막으로 설정된 멤버값만 사용가능 나머지는 구조체와 동일
+############################################################################################################################################
+#include <stdio.h>
+
+union Number {
+    int intValue;
+    float floatValue;
+};
+
+int main() {
+    union Number num;
+
+    num.intValue = 10;
+
+    num.floatValue = 3.14;
+   
+    union Number num2;
+
+    num2.intValue = 20;
+    printf("%d\n", num.intValue);
+    //1078523331
+    printf("%d\n", num2.intValue);
+    //20
+    return 0;
+}
+############################################################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7. 비트 필드
+비트 필드느 int, unsigned 두가지 자료형을 지원하고 일반적으로 unsied만 사용함.
+비트 수는 1에서 16비트까지 가능하다 	
+############################################################################################################################################
+#include <stdio.h>
+
+struct Week {
+    unsigned int monday : 2;    // 1비트로 월요일을 표현 -> 3까지 표현 가능 -> 00, 01, 10, 11
+    unsigned int tuesday : 1;   // 1비트로 화요일을 표현 -> 0, 1만 표현가능 -> 0, 1
+    unsigned int wednesday : 1; // 1비트로 수요일을 표현
+    unsigned int thursday : 1;  // 1비트로 목요일을 표현
+    unsigned int friday : 1;    // 1비트로 금요일을 표현
+    unsigned int saturday : 1;  // 1비트로 토요일을 표현
+    unsigned int sunday : 1;    // 1비트로 일요일을 표현
+};
+
+int main() {
+    struct Week today = { 3, 2, 0, 0, 0, 0, 0 };
+    
+
+    printf("Monday: %d\n", today.monday);     // 1 (월요일을 나타냄)
+    //담을 수 있는 비트를 초과했기에 0 return
+
+    printf("Tuesday: %d\n", today.tuesday);   // 0 (화요일을 나타내지 않음)
+/*
+Monday: 3
+Tuesday: 0
+*/
+    return 0;
+}
+
+############################################################################################################################################

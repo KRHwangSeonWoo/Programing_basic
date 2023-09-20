@@ -1,2 +1,2 @@
 # System_programing
-linux
+C and System programing basic

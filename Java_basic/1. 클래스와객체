@@ -1,0 +1,462 @@
+[클래스와 객체 1]
+
+들어가기 전!! 용어 정리
+
+객체 : 객체지향 프로그램의 대상, 생성된 인스턴스
+클래스 : 객체를 프로그래밍하기 위해 코드를 만든 상태
+인스턴스 클래스가 메모리에 생성된 상태
+멤버변수 : 클래스의 속성, 특성
+메소드 : 멤버 변수를 이용하여 클래스의 기능을 구현
+참조 변수 : 메모리의 생성된 인스턴스를 가르키는 변수
+참조 값 : 생성된 인스턴스의 메모리 주소 값
+
+(1) 클래스와 인스턴스 : 
+
+1) 클래스는 멤머 변수와 메소드로 구분이됨
+#############################################################################################################################
+package classAndObject;
+
+public class Class {
+
+	//클래스는 멤머 변수와 메소드로 구분이됨
+	
+	//멤버 변수 = 클래스 변수
+	int studentID;
+	String name;
+
+	//메소드 = 클래스 함수
+	public void showStudentInfo() {
+		studentID = 12;
+		name = "hwangseonwoo";
+		System.out.println(name);
+		
+	}
+	
+	public static void main(String[] args) {
+		Class classPratice = new Class();
+		classPratice.showStudentInfo();
+		
+		classPratice.name = "lee";
+		System.out.println(classPratice.name);
+		//결과값: lee
+	
+		Class classPratice2 = new Class();
+		System.out.println(classPratice2.name);
+		//결과값 : null
+	}
+	
+}
+#############################################################################################################################
+
+2) 인스턴스
+
+1. 인스턴스는 클래스가 메모리 공간에 생성된 상태임, 즉 메모리 공간에 해당 클래스의 내용을 포함하는 인스턴스가 생성되어 사용이 가능한거임 
+#############################################################################################################################
+package classAndObject;
+
+public class Class {
+
+	//클래스는 멤머 변수와 메소드로 구분이됨
+	
+	//멤버 변수 = 클래스 변수
+	int studentID;
+	String name;
+
+	//메소드 = 클래스 함수
+	public void showStudentInfo() {
+		studentID = 12;
+		name = "hwangseonwoo";
+		System.out.println(name);
+		
+	}
+	
+	public static void main(String[] args) {
+		
+		/*
+		showStudentInfo();만 사용하면 에러가 남. 현재 해당 함수가 메모리에 적제되지 않아서 그럼
+		이를 해결하기 위해서는 객체를 생성하거나 해당 메소드가 속한 클래스의 객체를 생성하여 사용해야함
+		
+		classpratice 객체를 생성한 후 showStudentInfo() 함수를 사용하면 해당 객체의 변수 값이 정의됨(showStudentInfo() 함수 참조).
+		하지만 다른 객체를 새로 만들면 이전 객체와는 아예 다른 객체임
+		*/
+		Class classPratice = new Class();
+		classPratice.showStudentInfo();
+		
+		classPratice.name = "lee";
+		System.out.println(classPratice.name);
+		//결과값: lee
+	
+		Class classPratice2 = new Class();
+		System.out.println(classPratice2.name);
+		//결과값 : null
+	}
+	
+}
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+package classAndObject;
+
+public class InstanceTest {
+
+	Class student = new Class();
+	/*
+	아래 2줄은 오류남 -> 클래스는 멤버 변수와 메소드로 구성됨. 즉! 생성하는 것에 포커싱됨
+	하지만 아래 두개는 생성하는 것이 아님.
+	즉 변수 초기화 혹은 생성 및 함수 생성
+	student.showStudentInfo();
+	student.name = "lee";	
+	*/
+	
+	public static void main(String[] args) {
+		Class student = new Class();
+		student.showStudentInfo();
+		//결과 : hwangseonowoo
+		student.name = "lee";
+		System.out.println(student.name);
+		//결과 : Lee
+	}
+	
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+
+2. 인스턴스의 참조 변수 
+
+하나의 클래스로 여러개의 인스턴스를 생성하는데 각각 저장된 정보가 다른 것은 메모리를 각각 할당 받아 사용하기 때문임 
+아래와 같은 코드로 메모리에 저장된 각각의 메모리 주소를 알 수 있음(참조 주소)
+#############################################################################################################################
+package classAndObject;
+
+public class Class {
+	
+	int studentID;
+	String name;
+
+	public void showStudentInfo() {
+		studentID = 12;
+		name = "hwangseonwoo";
+		System.out.println(name);
+		
+	}
+	
+	public static void main(String[] args) {
+		Class classPratice = new Class();
+		System.out.println(classPratice);
+		//결과 : classAndObject.Class@7c30a502
+
+		Class classPratice2 = new Class();
+		System.out.println(classPratice2);
+		//결과 : classAndObject.Class@49e4cb85
+	}
+	
+}
+#############################################################################################################################
+
+(2) 생성자
+생성자의 역할은 주로 맴버 변수에 대한 값을 받아서 인스턴스로 새로 생성 시 멤버 변수를 초기화하는 역할을 함
+ex) 초기를 하든 안하든 자기 마음임, 만약에  이미 멤버 변수에 값이 초기화되어 있고 디폴트 생성자를 이용하여 인스턴스를 생성한다면 해당 인스턴스에 멤버 변수가
+존재할 것임, 아니면 따로 생성자 함수를 사용하여 인스턴스를 만들 때 custom된 생성자를 이용하여 인스턴스의 멤버 변수 값을 넣을 수도 있음
+
+1) 디폴트 생성자
+#############################################################################################################################
+package constructor_4;
+
+public class defaultConstructor_1 {
+
+	String name;
+	int age;
+	
+	/*
+	  public First(){ } <- 해당 코드(생성자)가 생략되어 있음. 따로 작성을 하지 않아도 괜찮으며 해당 코드는 default 생성자임
+	 */
+	
+	public static void main(String[] args) {
+		
+		defaultConstructor_1 first = new defaultConstructor_1();
+		first.name = "hi";
+		System.out.println(first.name);
+		
+	}
+}
+#############################################################################################################################
+
+2) Custom 생성자
+#############################################################################################################################
+package constructor_4;
+
+public class CustomConstructor_2_1 {
+
+	String name;
+	int age;
+	
+	public CustomConstructor_2_1(String pName) {
+		
+		name = pName;
+		
+	}
+}
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+
+package constructor_4;
+
+public class CustomConstructor_2_2 {
+	
+	public static void main(String[] args) {
+	
+		/*
+		    CustomConstructor_2_1 cu = new CustomConstructor_2_1();
+		
+		 	에러남. 현재 CustomConstructor_2_1 클래스는 매개 변수를 받아 사용하는 생성자인데,
+		 	해당 클래스에는 매개 변수를 받지 않는 생성자가 없음.
+		 	매개변수가 없는 default 생성자는 우리가 custom하게 선언하지 않았을 때 자동으로 삽입되는 것임. 
+		 */
+		
+		CustomConstructor_2_1 cu = new CustomConstructor_2_1("hwangseonwoo");
+		System.out.println(cu.name);
+		//결과 : hwangseonwoo
+		CustomConstructor_2_1 cu2 = new CustomConstructor_2_1("hwangseonwoo");
+		System.out.println(cu2.name);
+		//결과 : hwangseonwoo
+	
+	}
+
+}
+#############################################################################################################################
+
+3) 생성자 오버라이트
+클래스에서 생성자가 2개 이상일 경우를 의미함, 생성자 호출시 해당 포맷(인자)에 맞는 생성자로 불러옴
+#############################################################################################################################
+package constructor_4;
+
+public class ConOverload_3_1 {
+	
+	String name;
+	int age;
+		
+		public ConOverload_3_1() {
+		}
+		
+		public ConOverload_3_1(String pName) {
+			name = pName;
+		}
+		
+		public ConOverload_3_1(String pName, int pAge) {
+			name = pName;
+			age = pAge;
+		}
+	
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+
+package constructor_4;
+
+public class ConOverload_3_2 {
+	
+public static void main(String[] args) {
+		
+	ConOverload_3_1 student1 = new ConOverload_3_1();
+	student1.name = "student1";
+	student1.age = 11;
+	System.out.println(student1.name + student1.age);
+	//결과 : student111
+	ConOverload_3_1 student2 = new ConOverload_3_1("student2", 21);
+	System.out.println(student2.name + student2.age);
+	//결과 : student221
+	ConOverload_3_1 student3 = new ConOverload_3_1();
+	System.out.println(student3.name + student3.age);
+	//결과 : null0	
+	}
+}
+#############################################################################################################################
+
+4) new 예약어
+Student stduentAhn = new Student(); 코드는 Stduent 클래스 자료형으로 stduentAhn 변수를 선언하고, new Student();로 Student 클래스를 생성하여 studentAhn에 대입한다는
+뜻임.
+여기서 말하는 클래스가 "생성"된다함은 실제로 사용할 수 있도록 메모리에 할당 받는다는 뜻이고, 실제로 사용할 수 있도록 생성된 클래스를 "인스턴스"라고 부름
+
+
+
+
+
+(3) 참조 자료형
+크기가 정해진 기본자료형 (int, char, float 등 String 제외 -> String은 클래스임) 클래스 자료형으로 선언하는 참조 자료형 변수가 있음.
+중복되는 클래스의 데이터를 효율적으로 관리 가능할 것으로 보임.
+아래 예제는 Class1 참조 변수로 Class2에 멤버 변수로 생성하고, Class2의 생성자 함수에 Class1 형의 참조변수를 넣어 사용하는 것임. 
+#############################################################################################################################
+package referenceDataType_5;
+
+public class Address {
+	
+	String dosi;
+	String gu;
+	
+
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+package referenceDataType_5;
+
+public class Person {
+	
+	String name;
+	Address address;
+	
+	public Person(String pName, Address pAddress) {
+		name = pName;
+		address = pAddress;
+	}
+	
+	  public Address getAddress() {
+	        return this.address;
+	    }
+	
+	
+	public static void main(String[] args) {
+		
+		Address person1Address = new Address();
+		person1Address.dosi = "seoul";
+		person1Address.gu = "guenak";
+		
+		Person person1 = new Person("hwang", person1Address);
+		Address person1addressInfo = person1.getAddress();
+		System.out.print(person1addressInfo.gu);
+		//실행 값 : guenak
+		
+		System.out.print(person1.address.gu);
+		//실행 값 : guenak
+	}
+
+}
+#############################################################################################################################
+
+(4) 정보 은닉
+
+1) 정보은닉의 종류
+public: 외부 클래스 어디서나 접근이 가능
+protected: 같은 패키지 내부와 상속 관계의 클래스에서만 접근할 수 있고, 그외 클래스에서는 접근 불가
+아무것도 없는 경우: 같은 내부 패키지에서만 접근 가능
+private: 같은 클래스 내부에서만 접근 가능	
+#############################################################################################################################
+package accessmentControl;
+
+public class Private_1_1 {
+	
+	int studentID;
+	private String studentName;
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package class_1; 
+
+public class Class {
+
+	//클래스는 멤머 변수와 메소드로 구분이됨
+	
+	//멤버 변수 = 클래스 변수
+	int studentID;
+	String name;
+	protected int protected1 = 10;
+	private int private1 = 20;
+
+	//메소드 = 클래스 함수
+	public void showStudentInfo() {
+		studentID = 12;
+		name = "hwangseonwoo";
+		System.out.println(name);
+		
+	}
+	
+	public static void main(String[] args) {
+		Class classPratice = new Class();
+		classPratice.showStudentInfo();
+		
+		classPratice.name = "lee";
+		System.out.println(classPratice.name);
+		//결과값: lee
+	
+		Class classPratice2 = new Class();
+		System.out.println(classPratice2.name);
+		//결과값 : null
+	}
+	
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package accessmentControl_6;
+import class_1.Class;
+
+public class Private_1_2 extends class_1.Class {
+	
+	public static void main(String[] args) {
+	
+	////////////////////////////////public, default 테스트//////////////////////////////////////
+	//accessmentControl_6;패키지에 class1의 Class 클래스는 없기에  import하여 사용하여야 함.
+	//Class 클래스와 Class() 생성자 같은 경우 public으로 정의되었기에 사용 가능함
+	Class class1 = new Class();
+	//아래 코드는 오류남, class1 클래스는 studentID의 멤버 변수가 default(명시되지 않음)으로 import하였다고 해도 접근 제어자에 의해 마찬가지로 불러올 수 없음
+	//class1.studentID;
+	
+	////////////////////////////////private//////////////////////////////////////
+	//private1.stduentID는 default로 접근이 가능하지만 private1.studentName은 private로 접근이 불가능함.
+	Private_1_1 private1 = new Private_1_1();
+	private1.studentID = 1;
+	//private1.studentName = "hwang";
+	//오류 발생
+	
+	////////////////////////////////private, protected 테스트//////////////////////////////////////
+	//System.out.println(class1.protected1);
+	//오류 발생
+	//class_1.Class의 protected1 멤버 변수가 protected 접근 제어자를 가졌지만, 상속 관계의 클래스로 접근할 경우
+	//Class 객체가 아닌, 상속을 받은 Private_1_2 객체로 선언하고 사용가능하다는 의미이다. 
+	//(해당 테스트 코드에서 Class를 상속만 하고 main 함수에서 Class 클래스 객체를 생성하여
+	//Class 클래스의 protected 변수를 불러오는 것은 불가능 -> 당연한 소리, 상속과 관계 없이 이것은 다른 위치에 있는 패키지에 다이렉트로 불러오는 것과 같음 )
+	//교재에서도(238 Page) 상속받은 하위 클래스에서 public 처럼 사용할 수 있는 것이라고 한다.
+	//해당 예제는 다른 패키지에 있는 것을 불러와 객체를 생성하고(public이기에 가능) protected 멤버변수를 불러올 때 에러가 남.
+	//실행하는 곳이 다른 패키지에 존재하기 때문에 안되는 것임
+	//하지만 위에서도 말한 것처럼 상속하고 해당 자식 클래스에서 객체를 만들어 사용이 가능하기도 함 
+	
+	Private_1_2 pri = new Private_1_2();
+	System.out.println(pri.protected1);
+	//System.out.println(pri.private1);
+	//오류남
+	
+	}
+}
+#############################################################################################################################
+
+2) 외부에서 private 사용하기
+public 함수를 이용하여 private인 멤버변수 값을 가지고 올 수 있다.
+#############################################################################################################################
+package accessmentControl_6;
+
+public class Private_2_2 {
+	private int privateVariable1 = 1;
+	public int getPrivateVariable1() {
+		return privateVariable1;
+	}
+	public void setPrivateVariable1(int privateVariable1) {
+		this.privateVariable1 = privateVariable1;
+	}
+}
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package accessmentControl_6;
+
+public class GetSetMethod_2_1 {
+	
+	public static void main(String[] args) {
+		
+	 Private_2_2 private1 = new Private_2_2();
+	 
+	 //private.privateVariable1;
+	 //오류 발생
+	 
+	 System.out.println(private1.getPrivateVariable1());
+	 //결과 : 1
+	 
+	}
+}
+#############################################################################################################################

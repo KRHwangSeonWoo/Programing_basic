@@ -1,0 +1,280 @@
+[기본 클래스]
+
+C:\Program Files\Java\jdk-10.0.2\lib 아래에 src.zip이 있는데 이것을 압축을 풀고 보면
+C:\Program Files\Java\jdk-10.0.2\lib\java.base\java\lang 폴더에 String.java 파일이 있음.
+우리가 import한 적이 없지만, 사용할 수 있는 것은 컴파일할 때 import java.lang.*이 자동으로 추가되어 패키지 하위 클래스를 모두 사용할 수 있는 것임.
+[기본 클래스]에서 사용하는 모든 클래스는 java.lang에 속해있음.
+
+(1) Object 클래스
+모든 자바 클래스의 최상위 클래스임.
+우리가 컴파일할 때 클래스에 extends Object가 자동으로 쓰임.
+
+대표적으로 자주 사용되는 메소드는 아래와 같음
+
+String toString() -> 객체를 문자열로 표현하여 반환.
+boolean equals(Object obj) -> 두 인터페이스가 동일한지 여부를 반환. 재 정의하여 논리적으로 동일한 인터페이스임을 정의할 수 있음.
+int hashCode() -> 객체의 해시 코드값을 반환
+Object clone() -> 객체를 복제하여 동일한 멤버 변수 값을 가진 새로운 인스턴스 생성
+Class getClass() -> 객체의 Class를 반환
+void finalize() -> 인스턴스가 힙 메모리에서 제거될 때까지 가비지 컬렉터에 의해 호출되는 메소드임. 네트워크 연결 해제, 열려있는 파일 스트림 패제 등 구현
+void wait() -> 멀티 스레드 프로그램에서 사용하는 메소드. 스레드를 기다리는 상태로 만듦.
+void notify -> wait() 메소드에 의해 기다리고 있는 스레드를 실행 가능한 상태로 가져옴.
+
+1) toString() 메소드
+클래스이름@해시코드값을 return함.
+#############################################################################################################################
+package 기본클래스_7;
+
+public class ToString {
+	
+	String name;
+	
+	public static void main(String[] args) {
+		
+		ToString ins1 = new ToString();
+		System.out.println(ins1.toString());
+		//기본클래스_7.ToString@7c30a502
+
+		System.out.println(ins1);
+		//기본클래스_7.ToString@7c30a502	
+	}
+
+}
+#############################################################################################################################
+
+재정의도 가능
+#############################################################################################################################
+package 기본클래스_7;
+
+public class ToString extends Object{
+	
+	String name;
+	
+	@Override
+	public String toString() {
+	//public을 지우면 Cannot reduce the visibility of the inherited method from Object에러 발생
+	// -> 상속을 받아서 재정의를 하는 경우에 가시범위를 줄이는 것은 허용이 되지 않음.
+		
+		return this.name;
+		
+	}
+	
+	public static void main(String[] args) {
+		
+		ToString ins1 = new ToString();
+		ins1.name = "hwang";
+		System.out.println(ins1.toString());
+		//hwang
+
+		System.out.println(ins1);
+		//hwang	
+	}
+
+}
+#############################################################################################################################
+
+2) equals() 메소드
+인스턴스의 주소 값을 비교하여 boolean 값을 return함. 
+String, Integer 값만 같으면 같은 해시 코드 값을 return함 (재정의되어있기에)
+#############################################################################################################################
+package 기본클래스_7;
+
+public class Equals {
+	
+	String name;
+	
+	public static void main(String[] args) {
+		Equals ins1 = new Equals();
+		ins1.name = "hwang";
+		
+		Equals ins2 = ins1; // -> 메모리 주소 복사
+		
+		Equals ins3 = new Equals();
+		ins3.name = "hwang";
+		
+		if (ins1.equals(ins2)) {
+			System.out.println("ins1과 ins2는 같다");
+			//ins1과 ins2는 같다
+		}
+		
+		if (ins1.equals(ins3)) {
+			System.out.println("ins1과 ins3는 다르다");
+			//거짓이기에 출력이 되지 않음.
+		}		
+	}
+
+}
+#############################################################################################################################
+
+3) hashCode() 메소드
+해시 함수는 객체의 특징을 매개변수 값으로 넣으면 그 객체가 저장되어야 할 위치나 저장된 해시 테이블 주소를 반환함.
+***hashCode = hash(key);
+인스턴스 주소가 같으면 같은 해시 코드 값을 return함. 
+String, Integer 값만 같으면 같은 해시 코드 값을 return함 (재정의되어있기에)
+#############################################################################################################################
+package 기본클래스_7;
+
+public class HashCode {
+	
+	String name;
+
+	
+	
+	public static void main(String[] args) {
+		
+		String ins1 = new String("hi");
+		String ins2 = new String("hi");
+		System.out.println(ins1.hashCode()+","+ins2.hashCode());
+		//3329,3329
+
+		Integer ins3 = new Integer(1);
+		Integer ins4 = new Integer(1);
+		System.out.println(ins3.hashCode()+","+ins4.hashCode());
+		//1
+		
+		HashCode ins5 = new HashCode();
+		HashCode ins6 = new HashCode();
+		System.out.println(ins5.hashCode()+","+ins6.hashCode());
+		//2083562754,1239731077
+
+		
+	}
+}
+#############################################################################################################################
+
+4) clone 메소드
+객체 원본을 유지해 놓고 복사본을 사용할 때 사용한다.
+해당 메소드를 사용하기 위해서는 Cloneable 인터페이스를 구현하여야 한다.
+만약에 인터페이스 구현하지 않고 그냥 사용하는 경우 에러가 나는데 이때  함수에 throws CloneNotSupportTedException을 추가하여 사용한다.
+인터페이스를 선언했는데도 불구하고 구현하지 않고 사용하는 인터페이스를 마커 인터페이스라고 부른다.
+#############################################################################################################################
+package 기본클래스_7;
+
+public class Clone implements Cloneable {
+	
+	String name;
+
+	public static void main(String[] args) {
+		
+		Clone clo1 = new Clone();
+		clo1.name = "hwang";
+		
+		Clone clo3 = null;
+		
+		
+		try {
+			Object clo2 = clo1.clone();
+			clo3 = (Clone)clo2;
+			
+		} catch (CloneNotSupportedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println(clo3.name);
+		//hwang
+		
+		
+	}
+}
+#############################################################################################################################
+
+(2) String 클래스
+
+1) String을 선언하는 두가지 방법
+String str1 = new String("abc"); // 생성자의 매개변수로 문자열 생성
+String str2 = "test"; //문자열 상수를 가리키는 방식
+-> 
+생성자를 이용할 때는 abc 문자열을 위한 메모리(인스턴스)가 생성되고 같은 "test"로 다른 인스턴스를 생성하였다고 해도, 메모리 참조 값은 다름.
+문자열 상수를 이용할 때는 str2는 기존에 만들어져있던 "test" 문자열 상수의 메모리 주소를 가르킴
+str3을 생성해도 같은 메모리 주소를 가르킴
+#############################################################################################################################
+package 기본클래스_7;
+
+public class StringPra {
+	
+	public static void main(String[] args) {
+		
+		String str1 = new String("hi");
+		String str2 = new String("hi");
+		
+		System.out.println(str1 == str2);
+		//false
+		System.out.println(str1.equals(str2));
+		//true
+		
+		
+		String str3 = "hi";
+		String str4 = "hi";
+		
+		System.out.println(str3 == str4);
+		//true
+		System.out.println(str3.equals(str4));
+		//true
+		
+	}
+
+}
+#############################################################################################################################
+
+2) final char[] 변수
+String str1 = new String("hi");로 선언한 경우, String안에 private final char value[]라고 선언이 되어있음.
+즉 인스턴스 생성 이후  final로 해당 멤버변수의 값을 변경하지 못함.
+그렇기에 기존 String 인스턴스 문자열에 어떤 문자열을 추가하기 위해서는 아래처럼 새롭게 생성해야 함. (수정이 불가하기 때문, 아래의 예제를 보면 str1의 주소값이 바뀜)
+#############################################################################################################################
+package 기본클래스_7;
+
+public class FinalChar {
+	
+	public static void main(String[] args) {
+		
+		String str1 = new String("Hi");
+		String str2 = new String("Bye");
+		
+		System.out.println(str1);
+		//HI
+		System.out.println(System.identityHashCode(str1));
+		//2083562754
+		
+		
+		str1 = str1.concat(str2);
+		
+		System.out.println(str1);
+		//HiBye
+		System.out.println(System.identityHashCode(str1));
+		//1239731077
+	}
+
+}
+#############################################################################################################################
+
+3) StringBuffer와 StringBuilder 클래스
+문자열을 변경하거나 연결해야 할 때가 많은데 String 클래스를 사용하여 "계속"해서 문자열을 연결하거나 변경하는 프로그램을 작성하면 메모리가 많이 낭비됨.
+이때 사용하는 것이 StringBuffer와 StringBilder 클래스임.
+StringBuffer는 내부에서 변경이 가능한 char[](finalX)를 변수로 가지고 있음.
+StringBuffer는 빠르지만 안정성 측면에서 보장되지 않고, StringBuffer는 조금 느리지만 안정적이다. -> 스레드 동기화의 안정성의 차이
+str1은 0의 값을 가지고 있고, bui.append를 사용하면 append할 때마다 메모리가 새로 생성되는 것이 아니라 하나의 메모리에 문자열이 계속 추가되는 식이기에 메모리 사용률을 아낄 수 있음.
+#############################################################################################################################
+package 기본클래스_7;
+
+public class StringBufferAndB {
+
+
+	public static void main(String[] args) {
+		
+		String str1 = new String("0");
+		
+		StringBuilder bui = new StringBuilder(str1);
+		
+		bui.append("1");
+		bui.append("2");
+		
+		str1 = bui.toString();
+		
+		System.out.println(str1);
+		//012
+	}
+}
+#############################################################################################################################
+
+

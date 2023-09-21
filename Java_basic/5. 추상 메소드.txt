@@ -1,0 +1,202 @@
+[추상 클래스]
+
+(1) 추상 메서드의 정의
+1. 추상 클래스는 추상 메소드를 선언할 수 있다.
+2. 추상 메소드는 구현 코드가 없다. 즉 중괄호({})인 구현부가 없다.
+3. 클래스의 틀을 만들기 위해서 사용된다. 추상 클래스를 상속한 클래스는 추상 클래스이거나 일반 클래스인 경우이며, 
+일반 메소드인 경우 추상 클래스에서 만들어진 추상 메소드를 구현하여야 한다. 
+4. 추상 클래스로 인스턴스를 생성할 수 없다.
+5. 추상 메소드와 일반 메소드의 차이 -> 일반 메소드는 하위(자식) 클래스에서 정의하지 않아도 공통적으로 사용이 가능하고, 재정의할 수 있음.
+			             추상 메소드는 하위 클래스에서 정의하여야 하며, 정의하지 않으면 사용이 불가함.
+#############################################################################################################################
+package abstract_5;
+
+public abstract class abstract_1 {
+	
+	int age;
+	
+	public abstract_1() {
+		System.out.println("abstract_1 생성자");
+	}
+	
+	abstract void getPrint();
+	
+
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package abstract_5;
+
+public class Class_1 extends abstract_1 {
+
+	@Override
+	void getPrint() {
+		
+		System.out.println(this.age);
+	}
+	
+	
+	public static void main(String[] args) {
+		abstract_1 class1 = new Class_1();
+		class1.age = 10;
+		class1.getPrint();
+		//abstract_1 생성자
+		//10
+		
+		Class_1 class2 = new Class_1();
+		class2.age = 20;
+		class2.getPrint();
+		//abstract_1 생성자
+		//20
+		
+		/*
+		abstract_1 class3 = new abstract_1();
+		에러 */
+		
+	}
+	
+
+}
+#############################################################################################################################
+
+(2) 템플릿 메소드
+템플릿 메소드 (final)은 자식에서 오버라이딩이 불가능한 템플릿이다.
+#############################################################################################################################
+package abstract_5;
+
+public abstract class Car_2 {
+
+	public abstract void drive();
+	public abstract void stop();
+	
+	public void startCar() {
+		System.out.println("차에 시동을 겁니다.");
+	}
+	
+	public void turnOff() {
+		System.out.println("차에 시동을 끕니다.");
+	}
+
+	public void testCar_2() {
+		System.out.println("test");
+	}
+	
+	
+	final public void run() {
+		this.startCar();
+		this.drive();
+		this.stop();
+		this.turnOff();
+	}
+	
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package abstract_5;
+
+public class AICar_2 extends Car_2{
+
+	@Override
+	public void drive() {
+		System.out.println("AI가 스스로 운전합니다.");
+	}
+
+	@Override
+	public void stop() {
+		System.out.println("AI가 스스로 멈춥니다.");
+		
+	}
+	
+	
+
+}
+#############################################################################################################################
+package abstract_5;
+
+public class LegacyCar_2 extends Car_2{
+
+	@Override
+	public void drive() {
+		System.out.println("사람이 운전합니다.");
+		
+	}
+
+	@Override
+	public void stop() {
+		System.out.println("사람이 자동차를 멈춥니다.");
+		
+	}
+	
+	/* 오류 발생
+	@Override
+	public void run() {
+		
+	}
+	*/
+	
+	public void testLegacyCar() {
+		System.out.println("test");
+	}
+	
+	
+	public static void main(String[] args) {
+		
+		Car_2 car2 = new AICar_2();
+		car2.run();
+		//차에 시동을 겁니다.
+		//AI가 스스로 운전합니다.
+		//AI가 스스로 멈춥니다.
+		//차에 시동을 끕니다.
+		
+		//car2.testLegacyCar(); 오류 발생
+		car2.testCar_2();
+		//test
+		
+		
+		Car_2 car1 = new LegacyCar_2();
+		car1.run();
+		//차에 시동을 겁니다.
+		//사람이 운전합니다.
+		//사람이 자동차를 멈춥니다.
+		//차에 시동을 끕니다.
+
+		
+	}
+	
+	
+
+}
+#############################################################################################################################
+
+(3) final 예약어
+템플릿 메소드를 만들면서 final 예약어가 사용이 되었음.
+final예약어는 더 이상 수정이 불가하다는 것을 의미한다.
+사용 위치에 따라 의미가 다르다.
+변수 -> 상수를 의미
+메소드 -> final 메서드는 하위 클래스에서 재정의할 수 없다는 것을 의미
+클래스 -> final 클래스는 상속할 수 없음.
+#############################################################################################################################
+package abstract_5;
+
+final public class Final_3  {
+	
+	final int NUM = 11;
+	
+
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package abstract_5;
+
+/* 오류 발생
+public class Final_3_1 extends Final_3{
+*/
+public class Final_3_1 {
+	
+
+	public static void main(String[] args) {
+		
+		Final_3 a = new Final_3();
+		//a.NUM=333; -> 에러 발생
+		System.out.println(a.NUM);
+	}
+
+}
+#############################################################################################################################

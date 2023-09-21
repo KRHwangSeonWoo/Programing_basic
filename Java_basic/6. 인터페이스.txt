@@ -1,0 +1,385 @@
+[인터페이스]
+1. 인터페이스는 클래스가 제공하는 기능을 명시적으로 선언하는 역할을 한다.
+2. 인터페이스는 추상 메소드와 상수로만 이루어져있다. -> 자바 8버전 이후에는 default, 정적 메소드를 생성할 수 있다. (이 경우 완전한 메소드로)
+-> public, protected 사용 불가하며 이경우 static을 사용한다면 사용이 가능.
+3. (구현된 코드가 없기때문에) 인터페이스로 인스턴스를 생성할 수 없다. -> 구현 코드가 있을 수도 있지만 인스턴스 생성은 불가하다.
+4. 인터페이스를 받은 클래스는 인터페이스에 있는 메소드를 반드시 오버라이트하여 생성하여야 한다. (추상 클래스는 제외)
+
+(1) 인터페이스의 기초
+#############################################################################################################################
+package 인터페이스_6;
+
+public interface Interface_1 {
+	//인터페이스에서 선언한 변수는 상수와 같다 (final static)
+	String name = "hwang";
+	int age = 21;
+	
+	String getName(InterfaceCass intfa);
+	int getAge(InterfaceCass intfa);
+	
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------package 인터페이스_6;
+
+public class InterfaceCass implements Interface_1{
+
+	@Override
+	public String getName(InterfaceCass intfa) {
+		return this.name;
+	}
+
+	@Override
+	public int getAge(InterfaceCass intfa) {
+		return this.age;
+	}
+
+	public static void main(String[] args) {
+		InterfaceCass hwang = new InterfaceCass();
+		
+		System.out.println(hwang.getName(hwang));
+		//hwang
+		
+		//hwang.name = "lee"; -> 에러 발생
+	}
+}
+#############################################################################################################################
+
+(2) 인터페이스와 추상 클래스
+예) 인터페이스 (메소드 4개) -> 추상 클래스(메소드 4개중 2개 구현) -> 클래스(메소드 4개중 2개 구현)
+#############################################################################################################################
+package 인터페이스_6;
+
+public interface Interface_2 {
+	
+	void getName();
+	void getAge();
+	void getSex();
+	void getPushup();
+	
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------package 인터페이스_6;
+
+public abstract class Abstract_2 implements Interface_2 {
+
+	 String name;
+	 int age;
+	 String sex;
+	 int pushup;
+	 
+	@Override
+	public void getName() {
+		System.out.println(this.name);
+	}
+	
+	@Override
+	public void getAge() {
+		System.out.println(this.age);
+
+	}
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package 인터페이스_6;
+
+public class Class_2 extends Abstract_2{
+
+	@Override
+	public void getSex() {
+		System.out.println(this.sex);
+	}
+
+	@Override
+	public void getPushup() {
+		System.out.println(this.pushup);
+		
+	}
+	
+	public static void main(String[] args) {
+		Abstract_2 class1 = new Class_2();
+		class1.age = 22;
+		class1.pushup = 100;
+		class1.sex="남";
+		
+		class1.getAge();
+		//22
+		class1.getPushup();
+		//100
+		class1.getSex();
+		//남 -> 오버라이트되어 사용 가능
+		
+		Class_2 class2 = new Class_2();
+		class2.age = 25;
+		class2.pushup = 12;
+		
+		class2.getAge();
+		//25
+		class2.getPushup();
+		//12
+
+		
+	}
+
+}
+
+#############################################################################################################################
+
+(3) 인터페이스와 다형성
+#############################################################################################################################
+package 인터페이스_6;
+
+public interface AnimalInterface {
+	
+	public void move();
+	public void talk();
+
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+package 인터페이스_6;
+
+public class Dog implements AnimalInterface {
+
+	@Override
+	public void move() {
+		System.out.println("개가 두발로 걷습니다.");
+	}
+
+	@Override
+	public void talk() {
+		System.out.println("개가 짖습니다.");
+		
+	}
+
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package 인터페이스_6;
+
+public class Human implements AnimalInterface {
+
+	@Override
+	public void move() {
+		System.out.println("사람이 두발로 걷습니다.");
+	}
+
+	@Override
+	public void talk() {
+		System.out.println("사람이 말을 합니다.");
+		
+	}
+	
+	public static void main(String[] args) {
+		AnimalInterface human = new Human();
+		human.move();
+		human.talk();
+		//사람이 두발로 걷습니다.
+		//사람이 말을 합니다.
+		
+		AnimalInterface dog = new Dog();
+		dog.move();
+		dog.talk();
+		//개가 두발로 걷습니다.
+		//개가 짖습니다.
+		
+	}
+
+}
+#############################################################################################################################
+
+(4) 인터페이스의 요소
+자바 7까지는 추상 메소드와 상수 이 두가지만 선언해서 사용할 수 있었는데, 지금은 디폴트 메소드와 정적 메소드 기능을 제공한다.
+즉 해당 interface를 상속한 Class가 구현하지 않아도 인터페이스에서 default 메소드를 정의하면 사용이 가능하다.
+마찬 가지로 인터페이스에 default 메소드를 재정의가 가능하다.
+정적 메소드 같은 경우는 인터페이스 직접 참조로만 사용이 가능하다. 일반적인 Class에서 상속을 받은 경우 직접 참조와 인스턴스 생성으로 사용이 가능하지만 인터페이스는 불가함.
+#############################################################################################################################
+package 인터페이스_6;
+
+public interface Interface_7 {
+
+	default void test() {
+		System.out.println("test");
+	}
+	
+	default void override() {
+		System.out.println("test");
+	}
+	
+	
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package 인터페이스_6;
+
+public class Class_6 implements Interface_7{
+	
+	@Override
+	public void override() {
+		System.out.println("Override test");
+	}
+	
+	public static void main(String[] args) {
+		
+		Class_6 inter	= new Class_6();
+		inter.test();
+		//test
+		
+		inter.override();
+		//Override test
+
+		
+	}
+}
+#############################################################################################################################
+
+(5) 인터페이스에서 private 메소드 사용하기
+private는 기본적으로 자식에서 사용할 수 없다. 즉 같은 Class(interface)에 존재하여야 한다.
+외부에서 내부의 메소드에서 private 함수를 호출하게 끔 만들 수 있다.
+참고로 static 메소드 안에서는 일반 메소드를 호출하지 못하고 statatic 메소드만 호출 가능하다.
+#############################################################################################################################
+package 인터페이스_6;
+
+public interface Interface_8 {
+
+	private void test() {
+		System.out.print("test");
+	}
+	
+	default void getTest() {
+		test();
+	}
+	
+	
+	
+	static void staticTest() {
+		
+			System.out.println("test1");
+			staticTest2();
+
+	}
+	
+	static void staticTest2() {
+	//static 뺴면 에러 -> static 메소드 안에는 static 메소드가 아니면 호출이 안된다.
+	//static은 실행 시 메소드를 메모리에 올리는데 일반 메소드는 인스턴스 생성 후 메모리에 올라가게 된다 즉 에러가 발생
+		System.out.println("test2");
+}
+
+	
+	
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package 인터페이스_6;
+
+public class Class_8 implements Interface_8{
+	
+	public static void main(String[] args) {
+		Interface_8.staticTest();
+		//직접 참조
+		//test1
+		//test2
+		
+		
+		Class_8 ins1 = new Class_8();
+		ins1.getTest();
+		//test
+		
+		//ins1.staticTest();
+		//오류 발생 -> 인터페이스를 상속한 경우 직접 참조가 아니면 사용을 하지못함, 즉 인스턴스를 생성하여도 사용 못함
+	}
+
+}
+#############################################################################################################################
+
+(6) 인터페이스의 활용
+
+1) 한 클래스가 여러 인터페이스를 구현하는 경우
+#############################################################################################################################
+package 인터페이스_6;
+
+public interface Interface1 {
+	
+	void interface1();
+
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package 인터페이스_6;
+
+public interface Interface2 {
+	
+	void interface2();
+
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package 인터페이스_6;
+
+public class Class1 implements Interface1, Interface2 {
+
+	@Override
+	public void interface1() {
+		System.out.println("interface2 호출");
+	}
+
+	@Override
+	public void interface2() {
+		System.out.println("interface2 호출");	
+	}
+
+	
+	public static void main(String[] args) {
+		Interface1 inter1 = new Class1();
+		inter1.interface1();
+		
+		Interface2 inter2 = new Class1();
+		inter2.interface2();
+		
+		Class1 cla1 = new Class1();
+		cla1.interface1();
+		cla1.interface2();
+	}
+}
+#############################################################################################################################
+
+2) 두 인터페이스의 디폴트 메소드가 중복되는 경우 -> 자식에서 재정의해야 함.
+#############################################################################################################################
+package 인터페이스_6;
+
+public interface Interface2_1 {
+
+	default void interface1() {
+		System.out.println("interface1");
+	}
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package 인터페이스_6;
+
+public interface Interface2_2 {
+
+	default void interface1() {
+		System.out.println("interface2");
+	}
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+package 인터페이스_6;
+
+public class Class2 implements Interface2_1, Interface2_2 {
+	
+	@Override
+	public void interface1() {
+		System.out.println("오버라이딩된 메소드");
+	}
+	
+	
+	public static void main(String[] args) {
+		Interface2_1 cla1 = new Class2();
+		cla1.interface1();
+		//오버라이딩된 메소드
+		
+		Interface2_2 cla2 = new Class2();
+		cla2.interface1();
+		//오버라이딩된 메소드
+		
+		Class2 cla3 = new Class2();
+		cla3.interface1();
+		//오버라이딩된 메소드		
+	}
+	
+}
+#############################################################################################################################
+
+3) 인터페이스가 인터페이스를 상속하는 것이 가능하고, 클래스에서 클래스와 인터페이스를 상속하는 것이 가능하다.

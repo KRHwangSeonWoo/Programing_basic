@@ -241,6 +241,25 @@ Copy code
 const char *de ="hi";
 printf("%s", de[0]); //-> 읽어들이지 못함
 
+
+[char *a[] vs const char * constchar[]의 차이점]
+const char * a[] -> {"abc", "EFD"} 문자열 상수!
+char ab[3] = "ab";
+char * a[] => {ab, cd} 문자열 배열을 넣기!
+-> 이것도 마찬가지로 문자열 상수를 직접 받고 싶으면 const를 붙여야 함
+####################################################################
+const char* constchar[] = { "hi", "bye" }; // -> const 삭제시 에러
+	
+char ab[3] = "ab";
+const char* cd = "cd";
+char ef[3] = "ef";
+char* hi[] = { ab, /*cd -> 에러*/ ef};
+const char* hi2[] = { ab, cd , ef };
+//const로 받으면 문자열 배열도, 문자열 상수도 둘다 받을 수 있음
+printf("%s", hi2[2]);
+//ef
+####################################################################
+
 또한 int * a = 1, 혹은 int *a[] = {1,2,3}은 불가능한 이유를 설명한다.
 문자열은 const char *로 메모리 주소값을 반환하다는 것! {1,2,3}, 1에 커서를 올려보면 int로 나와있는데 이는 메모리 주소를 반환하는 것이 아닌
 int 형의 정수 타입의 "데이터"를 반환하는 것이기에 타입이 맞지 않아 오류!

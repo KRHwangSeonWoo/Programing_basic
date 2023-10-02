@@ -340,3 +340,76 @@ argv[]는 명령어와 인자를 담고있는 배열이다.
 -> char *argv[] = { a, b, c} ( O )
 -> char *argv[] = { "HI", "bye", "good"} ( X )
 
+###############################################################################################################################################################################
+[root@localhost ~]# cat test.c
+#include <stdio.h>
+
+int main(int argc, char *argv[]) {
+    int n;
+
+    printf("argc = %d\n", argc);
+
+    for (n = 0; n < argc; n++) {
+        printf("%s ", argv[n]); // Add a space to separate arguments
+    }
+
+    printf("\n"); // Add a newline character to improve output formatting
+
+    return 0; // Indicate a successful execution
+}
+
+[root@localhost ~]# ./a.out hi hi hi hi hi
+argc = 6
+./a.out hi hi hi hi hi
+
+###############################################################################################################################################################################
+
+
+
+
+
+
+
+
+
+getopt()함수로 옵션 처리
+getopt의 3번째 인자 값에서 사용 가능 한 옵션이 -a, -b, -c 처럼 "문자 형태 만!"을 사용한다면 abc로 설정
+-> getopt(argc, argv, "abc")
+
+a에서 인자값을 불러오는 옵션이 있으면 ( 3중 하나라도) abc:로 인자값 설정
+-> getopt(argc, argv, "abc:")
+###############################################################################################################################################################################
+[root@localhost ~]# cat test.c
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+    int opt;
+    int a_flag = 0;
+    char *b_arg = NULL;
+
+    while ((opt = getopt(argc, argv, "ab:")) != -1) {
+        switch (opt) {
+            case 'a':
+                a_flag = 1;
+                break;
+            case 'b':
+                b_arg = optarg; // optarg에 현재 옵션에 대한 인수가 저장됨
+			/*위의 예제에서 optarg 변수는 getopt() 함수를 호출할 때 자동으로 업데이트되고, 현재 처리 중인 옵션에 대한 인수를 가리킵니다. 
+			이를 통해 옵션의 인수를 효과적으로 검색하고 처리할 수 있습니다.*/
+                break;
+        }
+    }
+
+    printf("a_flag = %d\n", a_flag);
+    if (b_arg) {
+        printf("b_arg = %s\n", b_arg);
+    }
+
+    return 0;
+}
+
+[root@localhost ~]# ./a.out -a -b hihihi
+a_flag = 1
+b_arg = hihihi
+###############################################################################################################################################################################

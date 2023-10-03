@@ -1,0 +1,162 @@
+[디렉터리 다루기]
+
+리눅스에서는 디렉터리를 파일의 한 종류로 취급함
+
+#리눅스 파일은 3가지가 존재함.
+1. 디렉터리 -> 폴더
+2. 일반파일 -> 텍스트 파일, 실행파일 등 텍스트나 바이너리 파일
+3. 특수파일 -> 장치 파일이라고도 한다.
+장치 파일은 컴퓨터 시스템에서 하드웨어 장치와 소프트웨어 간의 통신을 지원하는 파일를 나타냅니다. 
+이 파일은 운영 체제와 하드웨어 장치 간의 상호 작용을 관리하고, 프로그램이 하드웨어를 제어하거나 데이터를 전송하는 데 사용됩니다.
+
+장치 파일은 대개 특정 디렉토리에 위치하며, 사용자와 프로그램은 이러한 파일을 통해 하드웨어 장치와 상호 작용할 수 있습니다. 
+예를 들어, 리눅스 또는 유닉스 시스템에서는 "/dev" 디렉토리에 장치 파일이 저장됩니다. 이러한 파일은 특수한 형식을 가지며, 일반 파일과는 다르게 처리됩니다.
+
+#리눅스에서 파일 구성
+1. 파일명 -> 사용자가 파일에 접근할 때 사용
+2. inode -> 외부적으로는 번호로 표시되며 파일의 소유자나 크기 등 실제 데이터를 저장하고 있는 데이터 블록의 위치를 나타내는 주소값을 가지고 있음, 
+ls -l할 때 나오는 정보가 inode에 있는 정보를 읽어 출력해주는 것임
+3. 데이터 노드 -> 실제로 데이터가 저장되는 하드디스크의 공간 (장치 파일인 경우 데이터 노드(블록)에 저장하지 않고 inode에 장치에 관한 정보를 저장함)
+
+#아래 함수들 정리
+1. 디렉터리 생성 및 삭제
+디렉터리 생성: int mkdir()
+디렉터리 삭제: int rmdir()
+
+2. 디렉터리 
+현재 위치 확인: char *getcwd();
+디렉터리명 변경: int rename()
+디렉터리 이동: int chdir() or int fchdir();
+
+3. 디렉터리 읽기 함수
+디렉터리 열기: DIR *opendir();
+디렉터리 닫기 int closedir();
+디렉터리 내용 읽기: struct dirent *readdir()
+디렉터리 오프셋: long telldir() or void seekdir() or void rewinddir()
+
+
+
+
+
+
+
+
+
+1. 디렉터리 생성 및 삭제
+
+
+
+
+
+(1) 디렉터리 생성
+int mkdir(const char *pathname, mode_t mode);
+######################################################################################################
+[root@localhost ~]# cat test.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+int main() {
+
+if(mkdir("hwang", 0755) == -1){
+perror("hwang");
+exit(1);
+}
+}
+[root@localhost ~]# ./a.out
+[root@localhost ~]# ./
+a.out   hwang/  test.c
+[root@localhost ~]# ./a.out
+hwang: File exists
+######################################################################################################
+
+
+
+
+(2) 디렉터리 삭제
+int rmdir(const char *pathname);
+######################################################################################################
+[root@localhost ~]# cat test.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+int main() {
+
+if(rmdir("hwang", 0755) == -1){
+perror("hwang");
+exit(1);
+}
+}
+[root@localhost ~]# ls
+a.out  hi.c  hwang  Makefile  print.c  test.c
+[root@localhost ~]# ./a.out
+[root@localhost ~]# ls
+a.out  hi.c  Makefile  print.c  test.c
+######################################################################################################
+
+
+
+
+
+
+2. 디렉터리 관리
+
+
+
+(1) 현재 작업 디렉터리 위치 검색
+
+
+1. getcwd()
+char *getcwd(char *buf, size_t size);
+
+3가지 방식으로 인자를 지정하여 사용 가능하다. 
+(2, 3은 시스템 내부에서 malloc()으로 메모리를 할당하여 사용됨으로 free를 꼭 해줘야 한다, 함수 내부에서 메모리를 할당하여 해당 문자열 배열의 포인터를 return하는 방식임)
+참고) char * 형식으로 (const X)로 return하기에 문자열 배열 형식으로 return함을 알 수 있음.
+1. buf에 저장할만큼 충분한 메모리를 할당하고 그 키기를 size에 지정 -> 불필요한 메모리 사용
+2. buf에 NULL을 지정하고 할당이 필요한 메모리 크기를 size에 지정(return 값으로 사용하는 법) -> 불필요한 메모리 사용
+3. buf에 NULL을 지정하고 메모리 크기를 0으로 지정(return 값으로 사용하는 법) -> 필요한 만큼 자동적으로 메모리 할당하여 사용
+
+######################################################################################################
+[root@localhost ~]# cat test.c
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+int main(char * argv[]) {
+
+        char* cwd;
+        char wd1[BUFSIZ];
+        char wd2[10];
+
+        getcwd(wd1, BUFSIZ);
+        printf("1방법: %s", wd1);
+
+        cwd = getcwd(NULL, BUFSIZ);
+        printf("2방법: %s", cwd);
+        cwd[0] = 'q';
+        printf("2방법의 0번째 인덱스 변경%s", cwd);
+        free(cwd);
+
+
+        cwd = getcwd(NULL, 0);
+        printf("3방법: %s", cwd);
+        free(cwd);
+
+        if (getcwd(wd2, 1) == NULL) {
+                perror("getcwd 오류");
+        }
+}
+
+[root@localhost ~]# ./a.out
+getcwd 오류: Numerical result out of range
+1방법: /root2방법: /root2방법의 0번째 인덱스 변경qroot3방법: /root
+######################################################################################################
+
+
+
+
+
+
+

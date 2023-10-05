@@ -546,7 +546,7 @@ int main() {
 
 포인터 배열 -> 요소로 주소 값을 가지고 있는 포인터
 배열 포인터 -> 배열 전체를 가르키는 포인터 (c (X), &c (o))
-
+-> 배열 포인터는 2차원 배열에서 많이 쓰임
 
 
 포인터 배열
@@ -606,7 +606,7 @@ int main() {
 배열 포인터
 
 char (*arr)[3];
-char 타입의 인덱스를 3개 가지고 있는 배열"을 가리키는 포인터입니다. 
+char 타입의 인덱스를 3개로 "간주"하는 배열 포인터 선언
 
 이것은 주로 다차원 배열을 인수로 전달할 때 사용됨.
 
@@ -673,6 +673,8 @@ void printMultiArray1(int arr[][3], int rows) {
 
 
 void printMultiArray2(int(*arr)[3], int rows) {
+//인자값 int (*arr)[3]은 배열 인덱스 개수 3마다
+이차원배열의 하나의 행으로 끊어서 인식
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < 3; ++j) {
             printf("%d ", arr[i][j]);

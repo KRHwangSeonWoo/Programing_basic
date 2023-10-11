@@ -158,6 +158,56 @@ getcwd 오류: Numerical result out of range
 
 
 
+2. get_current_dir_name 
+현제 디렉터리의절대 경로를 return한다.
+인자로 아무것도 전달하지 않으며  시스템이 자동으로 메모리에 할당해 경로를 저장하고 return함
+getcwd(NULL, 0)과 같은 방식으로 동작함.
+(위방법으로 사용하지말고 해당함수를 사용하자)
+
+######################################################################################################
+[root@localhost ~]# cat test.c
+#include<unistd.h>
+#include<stdlib.h>
+#include<stdio.h>
+
+int main() {
+        char* cwd;
+
+        cwd = get_current_dir_name();
+        printf("cwd = %s", cwd);
+        free(cwd);
+}
+[root@localhost ~]# ./a.out
+cwd = /root
+######################################################################################################
+
+
+
+
+
+
+
+
+(2) 디렉터리명 변경
+rename을 이용하여 디렉터리명 변경한다.
+
+######################################################################################################
+[root@localhost ~]# mkdir hwang
+[root@localhost ~]# ./a.out
+[root@localhost ~]# ls
+a.out  hi.c  kim  Makefile  print.c  test.c
+[root@localhost ~]# cat test.c
+#include<stdio.h>
+#include<stdlib.h>
+#include<sys/stat.h>
+
+int main(){
+
+if (rename("hwang","kim")==-1){
+        perror("rename");
+        exit(-1);
+}}
+######################################################################################################
 
 
 

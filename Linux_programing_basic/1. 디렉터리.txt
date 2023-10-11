@@ -25,6 +25,7 @@ ls -l할 때 나오는 정보가 inode에 있는 정보를 읽어 출력해주�
 
 2. 디렉터리 
 현재 위치 확인: char *getcwd();
+-> char *이기에 문자열 상수가 아닌 문자열 배열의 주소값을 return
 디렉터리명 변경: int rename()
 디렉터리 이동: int chdir() or int fchdir();
 

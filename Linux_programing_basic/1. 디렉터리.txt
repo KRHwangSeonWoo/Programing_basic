@@ -291,15 +291,18 @@ int main(){
 디렉터리 내용을 읽기 위해서는 디렉터리를 "열고" 읽어야 한다.
 + 닫는 것도 배워두자
  
-#디렉터리 열기: opendir()
+opendir(): 디렉터리 열기
 성공 시 DIR 포인터 return, 실패 시 NULL return
-#디렉터리 읽기: readdir()
+
+readdir(): 디렉터리 읽기
 DIR 포인터를 인자 값으로 받아서 DIR 포인터가 가르키는 디렉터리의 정보를 담은 dirent 구조체 포인터로 리턴한다.
-호출 시 마다 다른 파일의 정보를 담은 dirent 구조체 포인터를 return함
+호출 시 마다 그다음 파일의 정보를 담은 dirent 구조체 포인터를 return함
 (첫 호출 시 ., 두번째 시 .., 세번째 시 a, ....의 정보를 담아 dirent 구조체 형식으로 return)
-#디렉터리 닫기: closedir()
+
+closedir(): 디렉터리 닫기 
 디렉터리를 닫는다.
 ######################################################################################################
+[root@localhost ~]# cat test.c
 #include<stdio.h>
 #include<stdlib.h>
 #include<dirent.h>
@@ -312,10 +315,109 @@ int main(){
         dp = opendir("kim");
 
         while((dent=readdir(dp))){
-                printf("%s",dent->d_name);
+                printf("%s\n",dent->d_name);
         }
         closedir(dp);
 
 }
-
+[root@localhost ~]# ls -al kim/
+total 4
+drwxr-xr-x. 2 root root   33 Oct 11 19:24 .
+dr-xr-x---. 8 root root 4096 Oct 15 19:34 ..
+-rw-r--r--. 1 root root    0 Oct 11 19:24 a
+-rw-r--r--. 1 root root    0 Oct 11 19:24 b
+-rw-r--r--. 1 root root    0 Oct 11 19:24 c
+[root@localhost ~]# ./a.out
+.
+..
+a
+b
+c
 ######################################################################################################
+
+
+
+
+
+
+
+(5) 디렉터리 위치 변경 telldir/seekdir/rewinddir
+디렉터리를 열고 내용을 읽으면 디렉터리 스트림에서 현재 내용을 읽고 있는 나타내는 오프셋 값이 이동함
+현재의 디렉터리 위치를 읽고(telldir), 이동시키는(seekdir)함수를 사용하여 프로그래밍해보자
+
+아래 예제에서 확인해야 하는건은 readdir함수를 읽으면 dp 포인터가 가르키는 주소가 그 다음 파일로 이동되는데
+이때 telldir, seekdir, rewinddir을 사용하여 포인터를 초기점으로 맞추어서 readdir을 호출 시에 처음으로 돌아가도록 하는것이다. 
+######################################################################################################
+[root@localhost hwang]# cat test.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+
+int main() {
+    DIR *dir;
+    struct dirent *entry;
+    long pos;
+
+    // 디렉토리 열기
+    dir = opendir("/root/hwang");
+    if (dir == NULL) {
+        perror("opendir");
+        return 1;
+    }
+
+    // 디렉토리 내용 읽기
+    while ((entry = readdir(dir)) != NULL) {
+        printf("File: %s\n", entry->d_name);
+}
+
+    // 현재 디렉토리 위치 저장
+    pos = telldir(dir);
+
+    // 디렉토리 위치 이동
+    seekdir(dir, pos);
+
+    // 저장된 위치부터 다시 읽기
+    printf("After seekdir:\n");
+    while ((entry = readdir(dir)) != NULL) {
+        printf("File: %s\n", entry->d_name);
+    }
+
+    // 디렉토리 위치 초기화 (처음으로 되돌아감)
+    rewinddir(dir);
+
+    // 처음부터 다시 읽기
+    printf("After rewinddir:\n");
+    while ((entry = readdir(dir)) != NULL) {
+        printf("File: %s\n", entry->d_name);
+    }
+
+    // 디렉토리 닫기
+    closedir(dir);
+
+    return 0;
+}
+
+[root@localhost hwang]# ./a.out
+File: .
+File: ..
+File: a.txt
+File: b.txt
+File: c.txt
+File: a
+File: test.c
+File: a.out
+After seekdir:
+After rewinddir:
+File: .
+File: ..
+File: a.txt
+File: b.txt
+File: c.txt
+File: a
+File: test.c
+File: a.out
+######################################################################################################
+
+
+
+

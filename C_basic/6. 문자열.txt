@@ -233,6 +233,10 @@ Copy code
 | h | i | \0|  // de 배열 메모리
 +---+---+---+
 
+당연히 문자열 배열을 const char *로 받을 수 있음
+char de[3] = "hi";
+const char * = de;
+
 [문자열 상수]
 const char *de = "hi";:
 

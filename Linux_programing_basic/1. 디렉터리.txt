@@ -344,19 +344,21 @@ c
 (5) 디렉터리 위치 변경 telldir/seekdir/rewinddir
 디렉터리를 열고 내용을 읽으면 디렉터리 스트림에서 현재 내용을 읽고 있는 나타내는 오프셋 값이 이동함
 현재의 디렉터리 위치를 읽고(telldir), 이동시키는(seekdir)함수를 사용하여 프로그래밍해보자
+rewinddir은 디렉토리 위치 초기화 (처음으로 되돌아감)이다.
 
-아래 예제에서 확인해야 하는건은 readdir함수를 읽으면 dp 포인터가 가르키는 주소가 그 다음 파일로 이동되는데
+아래 예제에서 확인해야 하는건은 readdir함수를 읽으면 해당 디렉터리에 존재하는 파일을 순차적으로 가르키면서 dirent 구조체 포인터를 반환하는데
+특정 파일의 위치를 기억하고 해당 위치부터 읽도록 할 수 있다. (telldir로 현재 디렉터리 위치를 알아내고, seekdir로 이동 시킴)
 이때 telldir, seekdir, rewinddir을 사용하여 포인터를 초기점으로 맞추어서 readdir을 호출 시에 처음으로 돌아가도록 하는것이다. 
 ######################################################################################################
-[root@localhost hwang]# cat test.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <string.h>
 
 int main() {
     DIR *dir;
     struct dirent *entry;
-    long pos;
+    long pos = 0;
 
     // 디렉토리 열기
     dir = opendir("/root/hwang");
@@ -367,11 +369,11 @@ int main() {
 
     // 디렉토리 내용 읽기
     while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, "a.txt") == 0) {
+            pos = telldir(dir); // "a.txt" 파일을 찾으면 위치를 저장
+        }
         printf("File: %s\n", entry->d_name);
-}
-
-    // 현재 디렉토리 위치 저장
-    pos = telldir(dir);
+    }
 
     // 디렉토리 위치 이동
     seekdir(dir, pos);
@@ -397,16 +399,28 @@ int main() {
     return 0;
 }
 
-[root@localhost hwang]# ./a.out
+[root@localhost ~]# ls -al /root/hwang/
+total 16
+drwxr-xr-x. 3 root root   67 Oct 15 20:11 .
+dr-xr-x---. 8 root root 4096 Oct 15 20:14 ..
+drwxr-xr-x. 2 root root    6 Oct 15 19:20 a
+-rwxr-xr-x. 1 root root 8784 Oct 15 19:30 a.out
+-rw-r--r--. 1 root root    0 Oct 15 19:19 a.txt
+-rw-r--r--. 1 root root    0 Oct 15 19:20 b.txt
+-rw-r--r--. 1 root root    0 Oct 15 19:20 c.txt
+[root@localhost ~]# ./a.out
 File: .
 File: ..
 File: a.txt
 File: b.txt
 File: c.txt
 File: a
-File: test.c
 File: a.out
 After seekdir:
+File: b.txt
+File: c.txt
+File: a
+File: a.out
 After rewinddir:
 File: .
 File: ..
@@ -414,8 +428,8 @@ File: a.txt
 File: b.txt
 File: c.txt
 File: a
-File: test.c
 File: a.out
+
 ######################################################################################################
 
 

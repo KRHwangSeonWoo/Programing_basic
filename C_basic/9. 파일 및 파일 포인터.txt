@@ -21,7 +21,6 @@ stderr -> 표준 오류 -> 모니터
 C에서 파일을 열기 위해서는 fopen으로 파일을 연다.
 
 File fopen(const char *filename, const char *mode);
-#const char *는 문자열의 형과 일치함.
 
 모드는 r, w, a가 있고, r은 읽기, w는 안에 내용 비우고 쓰기, a는 안에 내용 냅두고 추가로 쓰기이다.
 r+, w+, a+가 있는데 일단 읽기와 쓰기는 dafault로 되고 각 특색은 유지된다고 이해하면 된다. (a는 추가 w는 기존내용지우고 쓰기)

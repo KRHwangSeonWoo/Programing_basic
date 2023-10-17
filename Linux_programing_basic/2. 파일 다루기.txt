@@ -1,0 +1,126 @@
+[파일 다루기]
+
+리눅스에서 파일의 정보는 inode에 저장되는데 파일의 종류, 접근 권한, 소유자의 UID, GID... 등 파일의 여러 정보가 담겨 있다.
+inode의 정보를 검색하면 sys/stath 파일에 정의되어 있는 stat 구조체에 저장된다. 
+
+1. 파일 정보 검색
+int stat(const char *pathname, struct stat *statbuf);
+int fstat(int fd, struct stat *statbuf);
+
+2. 파일 접근 권한 함수
+
+1) 파일 접근 권한 확인
+int access(const char *pathname, int mode);
+
+2) 파일 접근 권한 변경
+int chmod(const char *pathname, mode_t mode);
+int fchmod(int fd, mode_t mode);
+
+3. 링크 함수
+int link(const char *oldpath, const char* newpath); 하드링크 생성
+int symlink(const char *target, const char *linkpath); 실벌릭 링크 생성
+int lstat(const char *pathname, struct stat *statbuf); 심벌릭 링크 정보 검색
+ssize_t readlink(const char *pathname, char *buf, size_t bufsiz); 심벌릭 링크 내용 읽기
+char *realpath(const char *path, char *resolved_path); 실밀릭 링크 원본 파일의 경로 검색
+int unlink(const char *pathname); 링크 끊기
+
+
+
+
+
+
+(1) 파일 정보 검색
+stat의 st_mode을 출력할 때 파일 유형과 파일 권한을 더해서 출력해준다.
+
+[파일 유형]
+S_IFSOCK   0140000   socket
+S_IFLNK    0120000   symbolic link
+S_IFREG    0100000   regular file
+S_IFBLK    0060000   block device
+S_IFDIR    0040000   directory
+S_IFCHR    0020000   character device
+S_IFIFO    0010000   FIFO
+
++ 
+
+[권한]
+
+= 10644, 40666...
+    
+
+1. stat()
+파일의 이름으로 정보를 검색한다.
+가장 많이 쓰이는 함수이다.
+성공시 0, 실패시 -1 반환한다.
+파일의 정보를 검색할 때 읽기 이상의 권한이 꼭 없어도 된다. 해당 파일에 접근한 수 있도록 디렉터리에 권한만 있으면 충분하다.
+############################################################################################################
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+   struct stat statbuf;
+
+   if (stat("test.c", &statbuf) == 0) {
+       printf("파일 이름: test.c\n");
+       printf("파일 크기: %ld 바이트\n", statbuf.st_size);
+       printf("팈일의 소유자 ID: %d\n", statbuf.st_uid);
+       printf("파일의 그룹 ID: %d\n", statbuf.st_gid);
+       printf("파일의 권한: %o\n", statbuf.st_mode);
+   } else {
+       perror("stat");
+   }
+
+   return 0;
+}
+[root@localhost ~]# ./a.out 
+파일 이름: test.c
+파일 크기: 528 바이트
+팈일의 소유자 ID: 0
+파일의 그룹 ID: 0
+파일의 권한: 100644
+############################################################################################################
+
+
+
+
+
+2. fstat()
+현재 열려있는 (open() 함수로 인해) 파일의 디스크립터를 받아 파일 정보를 검색한 후 stat 구조체에 저장한다.
+############################################################################################################
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+
+int main() {
+    int fd;
+    struct stat statbuf;
+
+    fd = open("test.c",O_RDONLY);
+
+    if(fd == -1){
+        perror("open: test.c");
+    }
+
+    fstat(fd, &statbuf);
+
+    printf("Inode = %d", statbuf.st_ino);
+
+   return 0;
+}
+[root@localhost ~]# ./a.out 
+Inode = 16899233
+############################################################################################################
+
+
+
+
+
+
+
+

@@ -148,3 +148,183 @@ int main() {
 ############################################################################################################
 
 
+
+
+
+
+(2) 파일 접근 권한 검색
+
+
+1. 상수를 이용한 파일 접근 권한 검색
+
+파일 소유자(Owner) 권한:
+S_IRUSR: 소유자 읽기 권한
+S_IWUSR: 소유자 쓰기 권한
+S_IXUSR: 소유자 실행 권한
+S_IRWXU: 소유자 읽기, 쓰기 및 실행 권한 (위의 3개 상수를 OR 연산한 것)
+
+파일 그룹(Group) 권한:
+S_IRGRP: 그룹 읽기 권한
+S_IWGRP: 그룹 쓰기 권한
+S_IXGRP: 그룹 실행 권한
+S_IRWXG: 그룹 읽기, 쓰기 및 실행 권한 (위의 3개 상수를 OR 연산한 것)
+
+기타(Other) 권한:
+S_IROTH: 기타 읽기 권한
+S_IWOTH: 기타 쓰기 권한
+S_IXOTH: 기타 실행 권한
+S_IRWXO: 기타 읽기, 쓰기 및 실행 권한 (위의 3개 상수를 OR 연산한 것)
+############################################################################################################
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdio.h>
+
+int main(){
+    struct stat statbuf;
+    stat("hi.txt", &statbuf);
+
+    printf("%o\n",statbuf.st_mode & S_IRGRP);
+
+    if((statbuf.st_mode & S_IRGRP) != 0){
+        printf("그룹의 읽기 권한 있음\n");
+    }
+
+      if((statbuf.st_mode & S_IXGRP) != 0){
+        printf("그룹의 실행 권한 있음");
+    }
+
+}
+[root@localhost ~]# ls -al | grep hi.txt 
+-r--r--r--.  1 root    root     1192 Aug 29  2022 hi.txt
+[root@localhost ~]# ./a.out 
+40
+그룹의 읽기 권한 있음
+############################################################################################################
+
+############################################################################################################
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <unistd.h>
+
+int main() {
+    struct stat fileStat;
+    const char *filename = "hi.txt";
+
+    // 파일 정보 가져오기
+    if (stat(filename, &fileStat) == -1) {
+        perror("stat");
+        return 1;
+    }
+
+    // 소유자 권한 확인 (읽기 및 쓰기)
+    if ((fileStat.st_mode & S_IRUSR) && (fileStat.st_mode & S_IWUSR)) {
+        printf("소유자에 대한 읽기 및 쓰기 권한이 있습니다.\n");
+    } else {
+        printf("소유자에 대한 읽기 또는 쓰기 권한이 없습니다.\n");
+    }
+
+    return 0;
+}
+############################################################################################################
+
+
+
+
+2. access, 함수를 이용한 접근 권한 검색
+int access(const char *pathname, int mode);
+pathname의 파일이 mode의 권한을 가지고 있는지 확인하고 return함
+***단 유효 사용자 ID(EUID)가 아닌, 실제 사용자 ID(RUID)에 대한 권한만 확인 가능 -> 코드를 실행한 사용자
+
+RUID는 현재 프로세스가 시작될 때의 실제 사용자 ID를 나타냅니다. 즉, 프로세스를 시작한 사용자의 ID입니다.
+EUID는 현재 프로세스가 현재 실행 중인 상태에서 사용하는 사용자 ID를 나타냅니다. 이것은 현재 권한을 나타내며, 파일 액세스 및 시스템 호출과 같은 작업에 영향을 미칩니다.
+
+접근 권한이 있으면 0, 없으면 -1 return
+F_OK는 파일의 존재여부, R_OK는 읽기 권함임
+############################################################################################################
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h> // access 함수를 사용하기 위한 헤더 파일
+#include <stdio.h>
+#include <errno.h> // errno 변수와 ENOENT 상수를 사용하기 위한 헤더 파일
+#include <string.h> // 오류 메시지 출력을 위한 헤더 파일
+
+int main() {
+
+    if (access("linux.bak", F_OK) == -1) {
+        printf("linux.bak does not exist\n");
+    }
+
+    if (access("hi.txt", R_OK) == 0) {
+        printf("읽기 권한 있음\n");
+    }
+
+    if (access("hi.txt", X_OK) == 0) {
+        printf("실행 권한 있음1\n");
+    }
+
+    chmod("hi.txt", 0444);
+
+    if (access("hi.txt", X_OK) == 0) {
+        printf("실행 권한 있음2\n");
+    }
+
+    chmod("hi.txt", 0544);
+
+    if (access("hi.txt", X_OK) == 0) {
+        printf("실행 권한 있음3\n");
+    }
+
+    return 0;
+}
+[root@localhost ~]# chmod 444 hi.txt 
+[root@localhost ~]# ./a.out 
+linux.bak does not exist
+읽기 권한 있음
+실행 권한 있음3
+############################################################################################################
+                                                                                                                                                                 
+
+
+(3) 파일의 접근 권한 변경
+
+
+1. chmod
+int chmod(const char *filepath, mode_t mode);
+############################################################################################################
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdio.h>
+
+int main(){
+    chmod ("hi.txt", 0777); 
+}
+############################################################################################################
+
+
+
+2. fchmod, 파일 기술자로 접근 권한 변경
+############################################################################################################
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h> // open 함수와 파일 모드 플래그를 사용하기 위한 헤더 파일
+#include <stdio.h>
+#include <unistd.h> // fchmod 함수를 사용하기 위한 헤더 파일
+
+int main() {
+    int fileint;
+    FILE *file;
+
+    fileint = open("hi.txt", 0666); // 파일을 열고 파일 모드를 지정
+    if (fileint == -1) {
+        perror("open");
+        return 1;
+    }
+
+    fchmod(fileint, 0666); // 파일의 권한을 변경
+    // 파일을 사용한 후, 파일 디스크립터를 닫아주는 것이 좋습니다.
+    close(fileint);
+
+    return 0;
+}
+############################################################################################################

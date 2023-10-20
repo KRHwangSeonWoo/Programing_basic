@@ -328,3 +328,232 @@ int main() {
     return 0;
 }
 ############################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+(4) 링크 파일생성
+링크는 이미 있는 파일이나 디렉터레에 접근 할 수 있는 새로운 이름을 의미함.
+같은 파일이지만 여러 이름과 경로로 접근할 수 있게 하는 것임.
+ex) /lib 디렉터리는 /usr/lib 디렉터리의 심벌릭 링크로 유지하고 있음.
+
+하드 링크 (Hard Link):
+하드 링크는 동일한 파일에 대한 다른 이름 또는 경로를 제공합니다.
+원본 파일과 하드 링크 간에는 실질적인 차이가 없습니다. 즉, 두 파일은 동일한 데이터 블록을 가리킵니다.
+만일 원본 파일이 삭제되어도 하드 링크가 여전히 존재하면 데이터는 유지됩니다.
+디스크 공간을 더 소비하지 않으며 파일의 변경 내역이 모두 반영됩니다.
+
+심볼릭 링크 (Symbolic Link 또는 Soft Link):
+심볼릭 링크는 다른 파일이나 디렉토리를 가리키는 참조로, 원본 파일과 독립적인 엔티티입니다.
+심볼릭 링크는 원본 파일이 삭제되면 끊어지며, 원본 파일을 찾을 수 없을 때 무효화됩니다.
+디스크 공간을 추가로 사용하며 원본 파일의 경로를 저장하므로 경로 변경이 가능합니다.
+
+
+
+1. 하드 링크 생성, link()
+int link(const char *oldpath, const char *newpath);
+
+
+하드 링크는 파일에 접근할 수 있는 파일명을 새로 생성하는 것으로, 기존 파일과 동일한 inode를 사용함.
+하드 링크를 생성하면 inode에 저장된 링크 개수가 증가함.
+
+예제를 보면 기존 inode와 동일하기에 ls-al의 결과가 같은것을 확인할 수 있음.
+############################################################################################################
+#include <sys/types.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int main() {
+
+    struct stat statbuf;
+
+    stat("hi.txt", &statbuf);
+    printf("%d\n", statbuf.st_nlink);
+    //1
+    link("hi.txt", "hi.ln");
+
+    stat("hi.txt", &statbuf);
+    printf("%d\n", statbuf.st_nlink);
+    //2
+
+}
+[root@localhost ~]# ls -l | grep hi
+-rw-------. 2 root root 1192 Aug 29  2022 hi.ln
+-rw-------. 2 root root 1192 Aug 29  2022 hi.txt
+############################################################################################################
+
+
+
+
+
+
+2. 심벌릭 링크 생성, symlink()
+int symlink(const char *target, const char *linkpath);
+기존 파일과 다른 inode를 사용하며
+예제를 보면 기존 inode와 동일하기에 ls-al의 결과가 다른 것을 확인할 수 있음.
+############################################################################################################
+#include <sys/types.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int main() {
+
+    symlink("hi.txt", "hi2.txt");
+}
+[root@localhost ~]# ls -al | grep hi
+-rw-------.  1 root root 14659 Oct 18 21:18 .bash_history
+lrwxrwxrwx.  1 root root     6 Oct 19 19:24 hi2.txt -> hi.txt
+----------.  1 root root  1192 Aug 29  2022 hi.txt
+############################################################################################################
+
+
+
+
+
+
+3. 심벌릭 링크의 정보 검색, lstat()
+int lstat(const char *pathname, struct stat *statbuf);
+stat 함수를 이용하여 심벌릭 링크의 정보를 검색 시 원본 파일의 파일의 정보가 검색됨.
+그렇기에 lstat 함수를 이용하여 심벌릭 링크 자체의 정보를 검색해보자
+############################################################################################################
+#include <sys/types.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <sys/types.h>
+int main() {
+
+    struct stat statbuf;
+
+    symlink("hi.txt", "hi_sym.txt");
+
+    stat("hi.txt", &statbuf);
+    printf("%d\n", statbuf.st_ino);
+
+
+    stat("hi_sym.txt", &statbuf);
+    printf("%d\n", statbuf.st_ino);
+
+    lstat("hi_sym.txt", &statbuf);
+    printf("%d", statbuf.st_ino);
+
+}
+[root@localhost ~]# ./a.out 
+16899203
+16899203
+17612097
+############################################################################################################
+
+
+
+
+
+
+4. 심벌릭 파일의 내용 읽기, readlink
+ssize_t readlink(const char *pathname, char *buf, size_t bufsiz);
+심벌릭 링크를 열면 원본 파일이 열린다. 즉 심벌릭 링크의 데이터 블록이 아닌 원본 파일의 블록 데이터를 읽는 것이다.
+즉 심벌릭 링크의 데이터 블록을 읽기 위해서는 readlink() 함수를 사용한다.
+readlink함수는 읽어온 데이터 크기를 return한다. 실패 시 -1 return
+
+***sizeof(buf) - 1은 문자열을 저장하는 버퍼에서 NULL 종료 문자('\0')를 위해 한 바이트를 남겨두는 것입니다.
+readlink 함수는 지정된 파일의 심볼릭 링크 대상을 읽어서 버퍼에 저장하는데, 이때 심볼릭 링크 대상의 길이를 반환합니다. 
+그러나 readlink 함수가 반환하는 길이에 NULL 종료 문자를 포함하지 않기 때문에, 버퍼에 저장된 문자열을 NULL로 종료하기 위해 buf[n] = '\0'; 코드를 사용하는 것이 중요합니다.
+따라서 sizeof(buf) - 1은 버퍼의 크기에서 1을 뺀 값으로, 이를 사용하여 NULL 종료 문자를 저장할 공간을 확보하고 버퍼 오버런(버퍼의 끝을 넘어서 쓰기)을 방지합니다. 
+버퍼 오버런을 방지하기 위해 항상 문자열을 저장할 때 NULL 종료 문자를 고려해야 합니다.
+############################################################################################################
+#include <stdio.h>
+#include <unistd.h>
+#include <unistd.h>
+
+
+int main() {
+    char buf[BUFSIZ];
+    int n;
+
+    n = readlink("hi2.txt", buf, sizeof(buf) - 1);
+
+    if (n == -1) {
+        perror("readlink");
+        return 1;
+    }
+
+    buf[n] = '\0';
+    printf("%s\n", buf);
+
+    return 0;
+}
+[root@localhost ~]# ls -al | grep hi
+-rw-------.  1 root root 14659 Oct 18 21:18 .bash_history
+lrwxrwxrwx.  1 root root     6 Oct 19 19:24 hi2.txt -> hi.txt
+----------.  1 root root    10 Oct 19 19:31 hi.txt
+[root@localhost ~]# cat hi.txt 
+fdsfdsfsd
+[root@localhost ~]# ./a.out 
+hi.txt
+############################################################################################################
+
+
+
+
+
+
+
+
+5. 심벌릭 링크 원본 파일의 경로 읽기, realpath
+심벌릭 링크가 가르키는 원본 파일의 실제 경로명은 realpath()로 확인한다.
+realpath()는 심벌릭 링크명을 받아 return한다. 실패 시 null 포인터
+############################################################################################################
+#include <stdio.h>
+#include <unistd.h>
+#include <unistd.h>
+
+int main() {
+    char buf[BUFSIZ];
+
+    realpath("hi2.txt", buf);
+    printf("%s", buf);
+}
+[root@localhost ~]# ./a.out 
+/root/hi.txt
+############################################################################################################
+
+
+
+
+
+
+6. unlink, 링크 삭제
+############################################################################################################
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main() {
+    const char *filename = "hi2.txt";
+
+    if (unlink(filename) == 0) {
+        printf("링크가 성공적으로 제거되었습니다.\n");
+    } else {
+        perror("unlink"); // 에러 메시지 출력
+        return 1;
+    }
+
+    return 0;
+}
+
+[root@localhost ~]# ls -al | grep hi2.txt 
+lrwxrwxrwx.  1 root root     6 Oct 20 01:31 hi2.txt -> hi.txt
+[root@localhost ~]# ./a.out 
+링크가 성공적으로 제거되었습니다.
+[root@localhost ~]# ls -al | grep hi2.txt 
+############################################################################################################

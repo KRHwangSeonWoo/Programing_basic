@@ -189,8 +189,7 @@ reutrun 0 -> 파일 끝까지 읽어서 더이상 읽을 것이 없을 때
 return -1 -> 오류
 return > 0 -> 읽어들인 바이트 수
 
-[root@localhost ~]# cat hi.txt 
-ABCDEFGH
+
 
 [8바이트 문자 버퍼에 파일의 문자열(8바이트)를 읽어서 버퍼에 저장 -> 정상적으로 읽어들이지만 buf의 크기를 1byte 더 키워야 함 -> 잘못된 습관임]
 
@@ -268,6 +267,8 @@ int main() {
     printf("%s\n", buf);
     close(fd);
 }
+[root@localhost ~]# cat hi.txt 
+ABCDEFGH
 [root@localhost ~]# ./a.out 
 ABCDEFGH�@
 ####################################################################################
@@ -300,6 +301,8 @@ int main() {
     printf("%s\n", buf);
     close(fd);
 }
+[root@localhost ~]# cat hi.txt 
+ABCDEFGH
 [root@localhost ~]# ./a.out 
 ABCDEFGH
 ####################################################################################

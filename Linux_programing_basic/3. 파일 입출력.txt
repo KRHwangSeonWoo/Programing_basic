@@ -442,5 +442,22 @@ int main() {
 ####################################################################################
 
 
+dup2(int oldfd, int newfd);
+파일 기술자를 원하는 숫자로 할당이 가능하다.
+####################################################################################
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <stdlib.h>
+#include <sys/stat.h>
 
+int main() {
+    int old_fd = open("hi.txt", O_RDONLY);
+    int new_fd = dup2(old_fd, 10);
 
+    printf("%d\n", old_fd);
+    printf("%d", new_fd);
+}
+####################################################################################

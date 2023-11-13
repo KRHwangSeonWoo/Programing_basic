@@ -511,3 +511,40 @@ close(fd2);
 abcd5678901234567890
 abcd
 ####################################################################################
+
+
+
+6. 파일 삭제, remove()
+int remove(const char *pathname)
+remove함수는 내부 적으로 삭제할 대상이 파일이면 unlink() 함수를 호출하고, 디렉토리이면 rmdir() 함수를 호출한다.
+
+####################################################################################
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <stdlib.h>
+
+int main() {
+
+if(remove("hi.txt") == 1){
+    printf("hi.txt remove success!");
+}
+
+}
+[root@localhost ~]# touch hi.txt
+[root@localhost ~]# ./a.out 
+hi.txt remove success!
+[root@localhost ~]# ls | grep hi.txt
+####################################################################################
+
+
+
+
+
+7. 파일과 디스크 동기화 함수
+
+int fsync(int fd);
+fsync 함수는 파일의 내용을 디스크로 보내 메모리와 디스크의 내용을 동기화함
+fsync() 함수는 메모리의 내용이 디스크로 모두 기록되기 전에 리턴하지 않는다.
+

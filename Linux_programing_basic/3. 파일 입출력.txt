@@ -460,4 +460,54 @@ int main() {
     printf("%d\n", old_fd);
     printf("%d", new_fd);
 }
+[root@localhost ~]# ./a.out 
+3
+10
+####################################################################################
+
+
+
+5. 파일 기술자 제어
+open된 파일의 flags 추가
+
+읽기, 쓰기, 읽기/쓰기 모드:
+O_RDONLY: 파일을 읽기 전용으로 엽니다.
+O_WRONLY: 파일을 쓰기 전용으로 엽니다.
+O_RDWR: 파일을 읽기 및 쓰기 모드로 엽니다.
+
+파일 옵션 [플래그]:
+O_APPEND: 파일을 열 때마다 파일 끝에 추가하여 쓰기 작업을 수행합니다.
+O_CREAT: 파일이 없으면 새로운 파일을 생성합니다.
+O_EXCL: 파일이 이미 존재하는 경우 에러를 발생시킵니다.
+O_TRUNC: 파일을 열 때 내용을 삭제하고 비웁니다.
+####################################################################################
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <stdlib.h>
+
+int main() {
+
+int fd1 = open("hi.txt", O_RDWR);
+write(fd1, "abcd", 4);
+close(fd1);
+
+int fd2 = open("hi.txt", O_RDWR);
+
+int flags = fcntl(fd2, F_GETFL);
+flags |= O_APPEND;
+
+fcntl(fd2, F_SETFL, flags);
+write(fd2, "abcd", 4);
+
+close(fd2);
+
+}
+[root@localhost ~]# cat hi.txt 
+12345678901234567890
+[root@localhost ~]# ./a.out 
+[root@localhost ~]# cat hi.txt 
+abcd5678901234567890
+abcd
 ####################################################################################

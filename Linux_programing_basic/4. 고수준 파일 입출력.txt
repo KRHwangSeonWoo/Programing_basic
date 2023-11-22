@@ -219,5 +219,94 @@ null문자 포함 10개의 문자를 str1에 저장하고 이어서 str2에도 �
 
 
 4. 버퍼 기반 입출력
+고수준 파일 입출력에서는 한 번에 칩출력하는 버퍼의 크기를 지정해 버퍼 단위로 파일 입출력을 수행한다.
 
 
+(1) 버퍼 기반 입력 함수, fread()
+size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+파일 포인터에 size만큼의 데이터를 nmemb에서 지정한 개수만큼 읽어 ptr에 저장한다.
+성공적으로 수행하면 읽어온 항목수를 리턴하고 읽을 항목이 없으면 0을, 파일의 끝을 만나면 EOF를 return함.
+
+[buf 마지막을 \0으로 하지 않을 경우, 문자열의 끝을 인식하지 못하기에 이전에 썼던 내용이 삽입됨]
+#############################################################################
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+int main() {
+
+    FILE *rfp;
+
+    char buf[5];
+    int n;
+
+    rfp = fopen("hi.txt", "r");
+    while((n = fread(buf, 1, 4, rfp)) > 0){
+        buf[n] = '\0';
+        printf("byte:%d\nstr:%s\n\n", n, buf);
+
+    }
+
+    printf("--------------------------------\n");
+    
+    rfp = fopen("hi.txt", "r");
+    while((n = fread(buf, 1, 4, rfp)) > 0){
+        //buf[n] = '\0';
+        printf("byte:%d\nstr:%s\n\n", n, buf);
+    }
+
+
+
+}
+[root@localhost ~]# cat hi.txt 
+12341
+12342
+12343
+[root@localhost ~]# ./a.out 
+byte:4
+str:1234
+
+byte:4
+str:1
+12
+
+byte:4
+str:342
+
+
+byte:4
+str:1234
+
+byte:2
+str:3
+
+
+--------------------------------
+byte:4
+str:1234
+
+byte:4
+str:1
+12
+
+byte:4
+str:342
+
+
+byte:4
+str:1234
+
+byte:2
+str:3
+34
+
+[root@localhost ~]# 
+#############################################################################
+
+
+
+
+(2) 버퍼 기반 출력 함수, fwirte()
+size_t fwirte(const void *ptr, size_t size, size_t nmemb, FILE *stream)
+항목의 크기가 size인 데이터를 nmemb에서 지정한 개수만큼 ptr에서 읽어 stream으로 지정한 파일에 출력함.

@@ -37,6 +37,7 @@ int fclose()
 
 2. 문자 기반 입출력
 문자 기반 입출력의 함수에서는 저수준 처럼 바이트 단위로 입출력을 수행한다.
+문자 하나 하나 입출력!
 
 
 (1) 문자 단위 입력함수
@@ -104,5 +105,117 @@ c의 문자 값:
 [root@localhost ~]# cat bye.txt 
 hello world
 #############################################################################
+
+
+****************************************************************************
+문자열 기반(fgets) VS 버퍼 기반(fread)
+출력은 비슷비슷함! -> 상관쓰지 말자!
+****************************************************************************
+#문자열 기반(fgets)#
+fgets -> 파일의 끝이나 개행 문자까지 읽음, 지정한 크기 n -1 byte까지 읽고 마지막 문자열에 NULL 추가
+#버퍼 기반(fread)#
+fread -> 지정한 사이즈까지 읽음, 만약 문자열로 사용하고 싶다면 buf 사이즈를 읽을 사이즈에 +1하여 생성하고 수동으로 NULL을 추가하여 사용해야 함
+
+
+
+3. 문자열 기반 입출력
+
+
+(1) 문자열 기반 입력, fgets() -> 파일의 개행문자 즉 줄 단위로 읽어 들임
+char *gets(char *s)
+gets() 함수는 표준 입력에서 문자열을 읽음
+보안이 취약하여 사용을 하지 않는 것이 좋음!
+
+char *fgets(char *s, int size, FILE *stream)
+파일 포인터가 가르키는 파일에서 변수 size에 지정한 길이보다 하나 적게 문자열을 읽어 s에 저장한다.
+개행 문자나 파일의 끝을 만나면 해당 지점까지 읽어온다!
+그후 버퍼의 가장 뒤에는 자동으로 NULL을 삽입한다.
+
+
+
+
+(2) 문자열 기반 출력, puts(), fputs()
+int puts(const char *s)
+문자열 그대로 표준 출력한다.
+이때 개행문자를 추가하여 출력!
+
+
+int fputs(const char *s, FILE *stream)
+문자열을 지정한 파일 포인터가 가르키는 곳에 쓴다.
+출력할 때 개행문자를 출력하지 않는다.
+
+[문자열 단위로 fgets로 파일의 내용을 읽고 fputs로 파일에 쓰기]
+#############################################################################
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+int main() {
+
+FILE *rfp, *wfp;
+char buf[BUFSIZ];
+
+rfp = fopen("hi.txt", "r");
+wfp = fopen("bye.txt", "w");
+
+
+fgets(buf, BUFSIZ, rfp);
+fputs(buf, wfp);
+
+fclose(rfp);
+fclose(wfp);
+
+}
+[root@localhost ~]# cat hi.txt 
+1234
+1234
+1234
+[root@localhost ~]# cat bye.txt 
+[root@localhost ~]# ./a.out 
+[root@localhost ~]# cat bye.txt 
+1234
+#############################################################################
+
+
+#############################################################################
+#include <stdio.h>
+int main(void)
+{
+    char str1[10];
+    char str2[10];
+
+    fputs("Type sentence1 : ", stdout);
+    fgets(str1, sizeof(str1), stdin); //null문자 제외 문자 10개 저장 가능
+
+    fputs("Type sentence2 : ", stdout);
+    fgets(str2, sizeof(str2), stdin); //null문자 제외 문자 10개 저장 가능
+
+    printf("sentence1 : %s\n", str1);
+    printf("sentence2 : %s\n", str2);
+
+    return 0;
+}
+[root@localhost ~]# ./a.out 
+Type sentence1 : 123456789
+Type sentence2 : sentence1 : 123456789
+sentence2 : 
+
+[root@localhost ~]# 
+#############################################################################
+
+null문자 포함 10개의 문자를 str1에 저장하고 이어서 str2에도 문자열을 저장하려 했는데. 두 번째 문자열은 저장할 기회조차 없었습니다.
+
+사실 우리가 처음 입력한 문장은 엔터키를 치는 것까지 포함하여 "123456789\n" 입니다. 
+\n이 입력되는순간(엔터키를 치는 순간) 버퍼로 123456789\n이 이동되고 fgets 함수는 입력버퍼에서 123456789 9개만 읽어들이고 마지막 하나는 null문자로 채웁니다. 
+그럼 버퍼에 아직 \n이 남아있는겁니다. 이어서 두 번째 fgets 함수가 실행되면 아직 버퍼에 \n이 남아있는것을 보고 바로 가져와서 str2에 저장합니다. str2에는 \n이 저장되어 있는겁니다. 
+따라서 마지막 문장 sentence2 : 다음에는 printf문에 포함된 \n에 의해 한 번, str2에 저장된 \n이 %s를 통해 또 한 번 출력이 되어 개행이 총 두 번 이뤄진겁니다.
+
+
+
+
+
+
+4. 버퍼 기반 입출력
 
 

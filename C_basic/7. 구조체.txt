@@ -158,9 +158,6 @@ int main() {
 	struct student* ptr;
 	ptr = &s1;
 
-	printf("%s", *ptr->name);
-	//hwang
-
 	printf("%s", (*ptr).name);
 	//printf("%s", *ptr.name); -> 에러, 점연산자가 *연산자보다 우선순위가 높기에 *(ptr.name)으로 해석되어 오류가 발생함.
 	//hwang

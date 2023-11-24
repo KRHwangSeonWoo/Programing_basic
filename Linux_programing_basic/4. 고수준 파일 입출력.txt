@@ -309,4 +309,99 @@ str:3
 
 (2) 버퍼 기반 출력 함수, fwirte()
 size_t fwirte(const void *ptr, size_t size, size_t nmemb, FILE *stream)
-항목의 크기가 size인 데이터를 nmemb에서 지정한 개수만큼 ptr에서 읽어 stream으로 지정한 파일에 출력함.
+ptr이 가지고 있는 값을 size * nmemb만큼 읽어들여 stream에 저장
+#############################################################################
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+int main() {
+
+    FILE *rfp;
+    FILE *wfp;
+
+    char buf[5];
+    int n;
+
+    rfp = fopen("hi.txt", "r");
+    wfp = fopen("bye.txt", "w");
+    
+    while((n = fread(buf, 1, 4, rfp)) > 0){
+        buf[n] = '\0';
+        fwrite(buf, sizeof(char)*1, n, wfp);
+
+    }
+  
+}
+[root@localhost ~]# cat hi.txt 
+12341
+12342
+12343
+[root@localhost ~]# cat bye.txt 
+[root@localhost ~]# ./a.out 
+[root@localhost ~]# cat bye.txt 
+12341
+12342
+12343
+[root@localhost ~]# 
+#############################################################################
+
+
+
+
+
+
+
+
+5. 형식 기반 입출력
+fgets()와 같은 함수는 문자열 형식을 고려하지 않고 한 행씩 읽어옴 -> 한칸씩 띄어진 것을 기준으로 해당 값을 가지고 오지는 못함
+
+
+
+(1) fscanf(), fprintf()
+fscanf 함수는 C 언어에서 파일에서 데이터를 읽어 변수에 저장하는 함수이다.
+fscanf 함수는 형식화된 입력을 수행하여 파일로부터 데이터를 읽어와서 변수에 저장함
+
+파일의 내용을 정해진 형식에 맞춰 읽어온다. 입력값이 형식에 맞지 않거나 너무 빨리 파일의 끝에 도달하면 0을 리턴한다.
+파일의 끝을 만나면 EOF를 return함
+
+fscanf 함수에서 형식 지정 문자열(format)은 파일에서 읽어들일 데이터의 형식을 지정함. 
+fscanf 함수는 형식 지정 문자열에서 공백(스페이스, 탭, 개행 등)을 사용하여 데이터를 나누어 읽음
+
+#############################################################################
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int id, a, b, c;
+    FILE *rfp, *wfp;
+
+    rfp = fopen("hi.txt", "r");
+    wfp = fopen("bye.txt", "w"); 
+
+    printf("학번    평균\n");
+   
+    while(fscanf(rfp, "%d %d %d %d", &id, &a, &b, &c) != EOF){
+         printf("%d : %d\n", id, (a + b + c) / 3);
+         fprintf(wfp, "%d : %d\n", id, (a + b + c) / 3);
+    }
+
+    fclose(rfp);
+    fclose(wfp);
+
+}
+[root@localhost ~]# cat hi.txt 
+202201 70 69 30
+202202 32 23 42
+202203 52 23 10
+[root@localhost ~]# ./a.out 
+학번    평균
+202201 : 56
+202202 : 32
+202203 : 28
+[root@localhost ~]# cat bye.txt 
+202201 : 56
+202202 : 32
+202203 : 28
+#############################################################################

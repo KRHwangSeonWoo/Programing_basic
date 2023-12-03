@@ -1,0 +1,435 @@
+[디렉터리 다루기]
+
+리눅스에서는 디렉터리를 파일의 한 종류로 취급함
+
+#리눅스 파일은 3가지가 존재함.
+1. 디렉터리 -> 폴더
+2. 일반파일 -> 텍스트 파일, 실행파일 등 텍스트나 바이너리 파일
+3. 특수파일 -> 장치 파일이라고도 한다.
+장치 파일은 컴퓨터 시스템에서 하드웨어 장치와 소프트웨어 간의 통신을 지원하는 파일를 나타냅니다. 
+이 파일은 운영 체제와 하드웨어 장치 간의 상호 작용을 관리하고, 프로그램이 하드웨어를 제어하거나 데이터를 전송하는 데 사용됩니다.
+
+장치 파일은 대개 특정 디렉토리에 위치하며, 사용자와 프로그램은 이러한 파일을 통해 하드웨어 장치와 상호 작용할 수 있습니다. 
+예를 들어, 리눅스 또는 유닉스 시스템에서는 "/dev" 디렉토리에 장치 파일이 저장됩니다. 이러한 파일은 특수한 형식을 가지며, 일반 파일과는 다르게 처리됩니다.
+
+#리눅스에서 파일 구성
+1. 파일명 -> 사용자가 파일에 접근할 때 사용
+2. inode -> 외부적으로는 번호로 표시되며 파일의 소유자나 크기 등 실제 데이터를 저장하고 있는 데이터 블록의 위치를 나타내는 주소값을 가지고 있음, 
+ls -l할 때 나오는 정보가 inode에 있는 정보를 읽어 출력해주는 것임
+3. 데이터 노드 -> 실제로 데이터가 저장되는 하드디스크의 공간 (장치 파일인 경우 데이터 노드(블록)에 저장하지 않고 inode에 장치에 관한 정보를 저장함)
+
+#아래 함수들 정리
+1. 디렉터리 생성 및 삭제
+디렉터리 생성: int mkdir()
+디렉터리 삭제: int rmdir()
+
+2. 디렉터리 
+현재 위치 확인: char *getcwd();
+디렉터리명 변경: int rename()
+디렉터리 이동: int chdir() or int fchdir();
+
+3. 디렉터리 읽기 함수
+디렉터리 열기: DIR *opendir();
+디렉터리 닫기 int closedir();
+디렉터리 내용 읽기: struct dirent *readdir()
+디렉터리 오프셋: long telldir() or void seekdir() or void rewinddir()
+
+
+
+
+
+
+
+
+
+1. 디렉터리 생성 및 삭제
+
+
+
+
+
+(1) 디렉터리 생성
+int mkdir(const char *pathname, mode_t mode);
+######################################################################################################
+[root@localhost ~]# cat test.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+int main() {
+
+if(mkdir("hwang", 0755) == -1){
+perror("hwang");
+exit(1);
+}
+}
+[root@localhost ~]# ./a.out
+[root@localhost ~]# ./
+a.out   hwang/  test.c
+[root@localhost ~]# ./a.out
+hwang: File exists
+######################################################################################################
+
+
+
+
+(2) 디렉터리 삭제
+int rmdir(const char *pathname);
+######################################################################################################
+[root@localhost ~]# cat test.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+int main() {
+
+if(rmdir("hwang", 0755) == -1){
+perror("hwang");
+exit(1);
+}
+}
+[root@localhost ~]# ls
+a.out  hi.c  hwang  Makefile  print.c  test.c
+[root@localhost ~]# ./a.out
+[root@localhost ~]# ls
+a.out  hi.c  Makefile  print.c  test.c
+######################################################################################################
+
+
+
+
+
+
+2. 디렉터리 관리
+
+
+
+(1) 현재 작업 디렉터리 위치 검색
+
+
+1. getcwd()
+char *getcwd(char *buf, size_t size);
+
+3가지 방식으로 인자를 지정하여 사용 가능하다. 
+(2, 3은 시스템 내부에서 malloc()으로 메모리를 할당하여 사용됨으로 free를 꼭 해줘야 한다, 함수 내부에서 메모리를 할당하여 해당 문자열 배열의 포인터를 return하는 방식임)
+1. buf에 저장할만큼 충분한 메모리를 할당하고 그 키기를 size에 지정 -> 불필요한 메모리 사용
+2. buf에 NULL을 지정하고 할당이 필요한 메모리 크기를 size에 지정(return 값으로 사용하는 법) -> 불필요한 메모리 사용
+3. buf에 NULL을 지정하고 메모리 크기를 0으로 지정(return 값으로 사용하는 법) -> 필요한 만큼 자동적으로 메모리 할당하여 사용
+
+######################################################################################################
+[root@localhost ~]# cat test.c
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+int main(char * argv[]) {
+
+        char* cwd;
+        char wd1[BUFSIZ];
+        char wd2[10];
+
+        getcwd(wd1, BUFSIZ);
+        printf("1방법: %s", wd1);
+
+        cwd = getcwd(NULL, BUFSIZ);
+        printf("2방법: %s", cwd);
+        cwd[0] = 'q';
+        printf("2방법의 0번째 인덱스 변경%s", cwd);
+        free(cwd);
+
+
+        cwd = getcwd(NULL, 0);
+        printf("3방법: %s", cwd);
+        free(cwd);
+
+        if (getcwd(wd2, 1) == NULL) {
+                perror("getcwd 오류");
+        }
+}
+
+[root@localhost ~]# ./a.out
+getcwd 오류: Numerical result out of range
+1방법: /root2방법: /root2방법의 0번째 인덱스 변경qroot3방법: /root
+######################################################################################################
+
+
+
+
+2. get_current_dir_name 
+현제 디렉터리의절대 경로를 return한다.
+인자로 아무것도 전달하지 않으며  시스템이 자동으로 메모리에 할당해 경로를 저장하고 return함
+getcwd(NULL, 0)과 같은 방식으로 동작함.
+(위방법으로 사용하지말고 해당함수를 사용하자)
+
+######################################################################################################
+[root@localhost ~]# cat test.c
+#include<unistd.h>
+#include<stdlib.h>
+#include<stdio.h>
+
+int main() {
+        char* cwd;
+
+        cwd = get_current_dir_name();
+        printf("cwd = %s", cwd);
+        free(cwd);
+}
+[root@localhost ~]# ./a.out
+cwd = /root
+######################################################################################################
+
+
+
+
+
+
+
+
+(2) 디렉터리명 변경
+rename을 이용하여 디렉터리명 변경한다.
+
+######################################################################################################
+[root@localhost ~]# mkdir hwang
+[root@localhost ~]# ./a.out
+[root@localhost ~]# ls
+a.out  hi.c  kim  Makefile  print.c  test.c
+[root@localhost ~]# cat test.c
+#include<stdio.h>
+#include<stdlib.h>
+#include<sys/stat.h>
+
+int main(){
+
+if (rename("hwang","kim")==-1){
+        perror("rename");
+        exit(-1);
+}}
+######################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+(3) 디렉터리 이동
+
+
+
+
+1. chdir()
+절대 경로, 상대 경로 모두 사용 가능
+성공하면 0, 실패하면 -1 반환
+######################################################################################################
+#include<unistd.h>
+#include<stdio.h>
+#include<stdlib.h>
+
+int main(){
+        char* cwd;
+        cwd = get_current_dir_name();
+        printf("%s",cwd);
+        chdir("kim");
+        cwd = get_current_dir_name();
+        printf("%s",cwd);
+        free(cwd);
+}
+[root@localhost ~]# ./a.out
+/root/root/kim
+######################################################################################################
+
+
+
+
+2. fchdir
+fchdir()함수는 파일 디스크립터를 인자로 받음
+즉 open()함수를 통해 파일 디스크립터를 return 받고 해당 파일 디스크립터를 인자로 줌
+fchdir()에 성공하면 0, 실패하면 -1 반환
+######################################################################################################
+#include<unistd.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<fcntl.h>
+int main(){
+        char* cwd;
+        int fd;
+
+        cwd = get_current_dir_name();
+        printf("%s",cwd);
+
+        fd = open("kim", O_RDONLY);
+        // O_RDONLY : 파일을 읽기 전용으로 open합니다.
+        //O_RDONLY는 fcntl.h에서정의됨.
+
+        fchdir(fd);
+        cwd = get_current_dir_name();
+
+        printf("%s",cwd);
+        free(cwd);
+}
+[root@localhost ~]# ./a.out
+/root/root/kim
+######################################################################################################
+
+
+
+
+
+
+
+
+
+
+(4) 디렉터리 내용 읽기
+디렉터리 내용을 읽기 위해서는 디렉터리를 "열고" 읽어야 한다.
++ 닫는 것도 배워두자
+ 
+opendir(): 디렉터리 열기
+성공 시 DIR 포인터 return, 실패 시 NULL return
+
+readdir(): 디렉터리 읽기
+DIR 포인터를 인자 값으로 받아서 DIR 포인터가 가르키는 디렉터리의 정보를 담은 dirent 구조체 포인터로 리턴한다.
+호출 시 마다 그다음 파일의 정보를 담은 dirent 구조체 포인터를 return함
+(첫 호출 시 ., 두번째 시 .., 세번째 시 a, ....의 정보를 담아 dirent 구조체 형식으로 return)
+
+closedir(): 디렉터리 닫기 
+디렉터리를 닫는다.
+######################################################################################################
+[root@localhost ~]# cat test.c
+#include<stdio.h>
+#include<stdlib.h>
+#include<dirent.h>
+int main(){
+        DIR *dp;
+        struct dirent *dent;
+
+        size_t dirent_size = sizeof(struct dirent);
+
+        dp = opendir("kim");
+
+        while((dent=readdir(dp))){
+                printf("%s\n",dent->d_name);
+        }
+        closedir(dp);
+
+}
+[root@localhost ~]# ls -al kim/
+total 4
+drwxr-xr-x. 2 root root   33 Oct 11 19:24 .
+dr-xr-x---. 8 root root 4096 Oct 15 19:34 ..
+-rw-r--r--. 1 root root    0 Oct 11 19:24 a
+-rw-r--r--. 1 root root    0 Oct 11 19:24 b
+-rw-r--r--. 1 root root    0 Oct 11 19:24 c
+[root@localhost ~]# ./a.out
+.
+..
+a
+b
+c
+######################################################################################################
+
+
+
+
+
+
+
+(5) 디렉터리 위치 변경 telldir/seekdir/rewinddir
+디렉터리를 열고 내용을 읽으면 디렉터리 스트림에서 현재 내용을 읽고 있는 나타내는 오프셋 값이 이동함
+현재의 디렉터리 위치를 읽고(telldir), 이동시키는(seekdir)함수를 사용하여 프로그래밍해보자
+rewinddir은 디렉토리 위치 초기화 (처음으로 되돌아감)이다.
+
+아래 예제에서 확인해야 하는건은 readdir함수를 읽으면 해당 디렉터리에 존재하는 파일을 순차적으로 가르키면서 dirent 구조체 포인터를 반환하는데
+특정 파일의 위치를 기억하고 해당 위치부터 읽도록 할 수 있다. (telldir로 현재 디렉터리 위치를 알아내고, seekdir로 이동 시킴)
+이때 telldir, seekdir, rewinddir을 사용하여 포인터를 초기점으로 맞추어서 readdir을 호출 시에 처음으로 돌아가도록 하는것이다. 
+######################################################################################################
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <string.h>
+
+int main() {
+    DIR *dir;
+    struct dirent *entry;
+    long pos = 0;
+
+    // 디렉토리 열기
+    dir = opendir("/root/hwang");
+    if (dir == NULL) {
+        perror("opendir");
+        return 1;
+    }
+
+    // 디렉토리 내용 읽기
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, "a.txt") == 0) {
+            pos = telldir(dir); // "a.txt" 파일을 찾으면 위치를 저장
+        }
+        printf("File: %s\n", entry->d_name);
+    }
+
+    // 디렉토리 위치 이동
+    seekdir(dir, pos);
+
+    // 저장된 위치부터 다시 읽기
+    printf("After seekdir:\n");
+    while ((entry = readdir(dir)) != NULL) {
+        printf("File: %s\n", entry->d_name);
+    }
+
+    // 디렉토리 위치 초기화 (처음으로 되돌아감)
+    rewinddir(dir);
+
+    // 처음부터 다시 읽기
+    printf("After rewinddir:\n");
+    while ((entry = readdir(dir)) != NULL) {
+        printf("File: %s\n", entry->d_name);
+    }
+
+    // 디렉토리 닫기
+    closedir(dir);
+
+    return 0;
+}
+
+[root@localhost ~]# ls -al /root/hwang/
+total 16
+drwxr-xr-x. 3 root root   67 Oct 15 20:11 .
+dr-xr-x---. 8 root root 4096 Oct 15 20:14 ..
+drwxr-xr-x. 2 root root    6 Oct 15 19:20 a
+-rwxr-xr-x. 1 root root 8784 Oct 15 19:30 a.out
+-rw-r--r--. 1 root root    0 Oct 15 19:19 a.txt
+-rw-r--r--. 1 root root    0 Oct 15 19:20 b.txt
+-rw-r--r--. 1 root root    0 Oct 15 19:20 c.txt
+[root@localhost ~]# ./a.out
+File: .
+File: ..
+File: a.txt
+File: b.txt
+File: c.txt
+File: a
+File: a.out
+After seekdir:
+File: b.txt
+File: c.txt
+File: a
+File: a.out
+After rewinddir:
+File: .
+File: ..
+File: a.txt
+File: b.txt
+File: c.txt
+File: a
+File: a.out
+
+######################################################################################################
+
+
+
+

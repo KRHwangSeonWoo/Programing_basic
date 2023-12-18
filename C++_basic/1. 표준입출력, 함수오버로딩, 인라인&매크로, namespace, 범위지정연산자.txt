@@ -151,6 +151,11 @@ hi
 
 
 
+
+
+
+
+
 2. 함수 오버로딩
 C에서는 함수의 이름이 동일한 것이 있는 것을 허용하지 않음
 하지만 C++에서는 그렇지 않음
@@ -208,7 +213,7 @@ int main(void) {
 
 
 (2) 디폴트 값은 함수의 선언 부분에만 표현 가능
-함수 선언 후 구현을 한다고 하면 선언 부분에 디폴트 값을 넣을 수 있고, 구현에서는 표현할 수 없다. (개발자 개발 방법론상)(3
+함수 선언 후 구현을 한다고 하면 선언 부분에 디폴트 값을 넣을 수 있고, 구현에서는 표현할 수 없다. (개발자 개발 방법론상)
 
 [좋지 않은 예]
 컴파일 상 문제는 없어보이나, 기본적으로 함수의 선언 - main - 정의 순으로 개발하도록 되어있는 듯하다.
@@ -308,6 +313,7 @@ int main(void) {
 	Func1(3, 4);
 }
 ############################################################
+
 
 
 
@@ -446,5 +452,176 @@ Com2 print 함수 호출
 
 
 
+(2) 같은 namespace 함수 호출 시 namespace 생략 가능
+############################################################              
+#include<iostream>
 
 
+
+namespace Com1 {
+	void print();
+	void content();
+
+}
+
+namespace Com2 {
+	void print();
+}
+
+int main() {
+	Com1::print();
+	Com2::print();
+
+}
+
+void Com1::content() {
+	std::cout << "Com1 content 함수" << std::endl;
+}
+
+void Com1::print() {
+	Com1::content();
+	content();
+	
+	Com2::print();
+
+}
+
+void Com2::print() {
+	std::cout << "Com2 print 함수 호출" << std::endl;
+}
+############################################################              
+Com1 content 함수
+Com1 content 함수
+Com2 print 함수 호출
+Com2 print 함수 호출
+
+
+
+
+
+
+
+
+
+(3) 이름 공간의 중첩
+이름 공간안에 이름 공간이 삽입될 수 있음
+ex) top::middle::low1
+############################################################              
+#include<iostream>
+
+namespace top {
+
+	namespace middle {
+
+		namespace low1 {
+			int low = 1;
+		}
+
+		namespace low2 {
+			int low = 2;
+		}
+
+
+	}
+
+}
+int main() {
+	std::cout << top::middle::low1::low << std::endl;
+	std::cout << top::middle::low2::low << std::endl;
+
+}
+############################################################ 
+1
+2
+
+
+
+(4) using을 이용한 이름공간의 명시
+std::cout를 사용할 때 std를 붙이지 않고 바로 cout를 사용할 수 있다.
+이렇게 사용하기 위해서는 using을 사용하여 특정 namespace를 지정해야 한다.
+
+
+1. using std::cout
+std의 cout를 사용할 때만 namesapce 생략하여 사용
+############################################################ 
+#include<iostream>
+using std::cout;
+int main() {
+	int a;
+	//cin >>  a 오류 
+	std::cin >> a;
+	cout << a << std::endl;
+}
+############################################################             
+4
+4
+
+
+2. using namespce std
+std안에 있는 모든 것에 대해 이름 공간 지정 생략
+############################################################             
+#include<iostream>
+using namespace std;
+int main() {
+	int a; 
+	cin >> a;
+	cout << a << std::endl;
+}
+############################################################             
+
+
+
+(5) namespace의 별칭 지정
+중복된 namespace에서 많이 중복된 경우
+namespace low1 = top::middle::low1; 이런식으로 선언이 가능하다.
+
+############################################################             
+#include<iostream>
+
+namespace top {
+
+	namespace middle {
+
+		namespace low1 {
+			int low = 1;
+		}
+
+		namespace low2 {
+			int low = 2;
+		}
+
+
+	}
+
+}
+int main() {
+	namespace low1 = top::middle::low1;
+
+	std::cout << top::middle::low1::low << std::endl;
+	std::cout << low1::low << std::endl;
+
+}
+############################################################   
+
+
+
+5. 범위지정 연산자의 또 다른 기능
+지역변수의 이름이 전역변수와 같을 경우, 지역변수가 더욱 우선시 된다.
+여기서 지역 함수에서 전역 변수의 값을 변경 시키고 싶을 경우, ::를 사용하면 된다.
+############################################################   
+#include<iostream>
+
+int num = 1;
+
+void fun1() {
+	int num = 2;
+	std::cout << num << std::endl;
+	std::cout << ::num << std::endl;
+
+}
+int main() {
+	fun1();
+}
+############################################################   
+2
+1

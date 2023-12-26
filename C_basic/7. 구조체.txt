@@ -23,7 +23,19 @@ struct stduent {
 	char name[30];
 	//char name[]; -> 에러 발생
 
+	void print(const char *str) {
+		printf("%s", str);
+	}
+
+	void printHello();
+
 }s1, s2;
+
+void stduent::printHello() {
+
+	printf("hello world");
+
+}
 
 
 
@@ -31,22 +43,24 @@ int main() {
 	//구조체 변수 생성 및 초기화
 	struct stduent s3 = { 25, "황선우" };
 
-	struct student s4;
-
 	s1 = { 10, "으쨋\n" };
 	s2 = { 20, "을깔라\n" };
 
+	s1.print("hihi");
+	//hihi
+	s1.printHello();
+	//helloworld
 	printf("%s", s1.name);
 	printf("%s", s2.name);
-	
+
 	//구조체 변수끼리 값을 대입할 수 있음.
 	s1 = s2;
 	printf("%s\n", s1.name);
-/*
-으쨋
-을깔라
-을깔라
-*/
+	/*
+	으쨋
+	을깔라
+	을깔라
+	*/
 }
 #######################################################################################################################################
 

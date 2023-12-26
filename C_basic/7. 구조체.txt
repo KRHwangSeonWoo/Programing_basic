@@ -307,11 +307,11 @@ struct student {
 };
 
 void print_student_info(struct student s) {
-	printf("%s, %d", s.name, s.age);
+	printf("%s, %d\n", s.name, s.age);
 }
 
 void print_student_info2(struct student* s) {
-	printf("%s, %d", (*s).name, (*s).age);
+	printf("%s, %d\n", (*s).name, (*s).age);
 	//printf("%s, %d", *s.name, *s.age); -> 에러
 
 }
@@ -325,12 +325,12 @@ int main() {
 	print_student_info(s1);
 	//hwang, 20
 
-	student* ptr = &s1;
+	struct student* ptr = &s1;
 
 	print_student_info2(ptr);
 	print_student_info2(&s1);
-	//print_student_info(*ptr); -> 에러
-	//print_student_info(s1); -> 에러 
+	print_student_info(*ptr);
+	print_student_info(s1);
 	//hwang, 20
 
 }

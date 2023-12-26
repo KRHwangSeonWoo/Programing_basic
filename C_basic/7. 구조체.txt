@@ -212,7 +212,7 @@ int main() {
 	strcpy((*ptr).name, "jun");
 	printf("%p\n", ptr->name);
 	//*ptr->name = "lee"; -> 에러
-	//00007FF6CA43D714 -> 문자열의 주소를 바꾼 것이 아닌, 값을 복사해서 줌
+	//요소가 문자열 배열이기에 strcpy로 복사해야 함
 	/*문자열 복사는 결국 문자열의 각 요소(문자)를 하나하나 복사하여 다른 메모리 영역에 저장하는 작업입니다.*/
 	
 	ptr = (struct student*)malloc(sizeof(struct student));

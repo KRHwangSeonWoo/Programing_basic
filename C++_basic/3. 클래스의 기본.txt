@@ -1,0 +1,54 @@
+[클래스의 기본]
+
+1. 클래스와 구조체의 차이점
+초기화 시 차이점! 클래스 외부에서 멤버 변수나 함수를 사용하기 위해서는 접근 제어자을 붙여줘야 한다!
+###############################################################
+#include <iostream>
+
+struct StructCar {
+	int wheel;
+	char size[6]="small";
+
+	void printWheel(){
+		std::cout << wheel;
+	}
+};
+
+
+class ClassCar {
+
+public:
+
+	int wheel;
+	char size[6] = "small";
+
+	void printWheel() {
+		std::cout << wheel;
+	}
+};
+
+class TestCar {
+
+	int wheel;
+	char size[6] = "small";
+
+	void printWheel() {
+		std::cout << wheel;
+	}
+};
+
+int main() {
+	struct StructCar car1 = { 4, "midi"};
+	std::cout << car1.size;
+	//위에 struct에서 문자열 배열 small을 midi로 재정의했지만 오류가 안남
+	//이건 재정의한 것이 아니라 인자 값이 없을 경우 small이란 값이 넣어지는 것임
+	//초기화가 안된 배열에 인자값을 넣을 경우 해당 인자값이 들어가고, 인자값이 없는 경우 default로 정의한 값이 들어가는 것임
+
+
+	ClassCar car2 = { 4, "small" };
+	TestCar car3;
+	//std::cout << car3.wheel; 오류 발생 -> Class 내부에 선언된것은 접근제어자로 외부에서 
+	//접근 가능하게 선언해줘야 밖에서 접근이 가능함
+
+}
+###############################################################

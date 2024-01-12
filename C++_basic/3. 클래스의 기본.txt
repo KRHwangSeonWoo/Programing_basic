@@ -10,14 +10,29 @@ public: 어디서든 접근 허용
 protected: 상속 관계에 놓여 있을 때, 유도 클래스에서의 접근 허용
 private: 클래스 내(클래스 내의 정의된 함수)에서만 접근 허용
 
+#아무것도 정의하지 않았을 때 
+구조체 -> public으로 간주
+클래스 -> private로 간주
+
 ###############################################################
 #include <iostream>
 
 struct StructCar {
 	int wheel;
-	char size[6]="small";
+	char size[6] = "small";
 
-	void printWheel(){
+	void printWheel() {
+		std::cout << wheel;
+	}
+};
+
+//구조체도 접근 제어자 사용이 가능하다.
+struct PrivateStructCar {
+private: 
+	int wheel;
+	char size[6] = "small";
+
+	void printWheel() {
 		std::cout << wheel;
 	}
 };
@@ -46,7 +61,7 @@ class TestCar {
 };
 
 int main() {
-	struct StructCar car1 = { 4, "midi"};
+	struct StructCar car1 = { 4, "midi" };
 	std::cout << car1.size;
 	//위에 struct에서 문자열 배열 small을 midi로 재정의했지만 오류가 안남
 	//이건 재정의한 것이 아니라 인자 값이 없을 경우 small이란 값이 넣어지는 것임
@@ -60,6 +75,9 @@ int main() {
 
 }
 ###############################################################
+
+
+
 
 2. C++에서의 파일분할
 어떤 프로그램이든 하나의 파일에 모든 것을 담지 않음.
@@ -102,6 +120,38 @@ int main() {
 
 }
 ###############################################################
+
+***아래 방법 처럼 헤더 파일 없이 cpp로만도 가능함***
+###############################################################
+// Test.cpp
+
+#include<iostream>
+
+class Test {
+public:
+    Test() {
+    }
+
+    void print() {
+        std::cout << "hihi\n";
+    }
+};
+-------------------------------------------------------------------------------------------
+// main.cpp
+
+#include "mainTest.cpp"  // 주의: 이 부분에서 cpp 파일을 직접 include
+
+int main() {
+    Test test;
+    test.print();
+    return 0;
+}
+###############################################################
+
+
+
+
+
 
 
 
@@ -166,3 +216,13 @@ int main() {
 }
 ###############################################################
 오류 발생
+
+
+
+
+
+
+
+
+4. 인라인 함수는 헤더 파일에 명시해야 한다. (정확히는 #include하는 파일에 직접 정의되어 있어야 한다)
+

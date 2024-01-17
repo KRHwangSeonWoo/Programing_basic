@@ -127,17 +127,16 @@ int main() {
     char str[100];
 
     printf("정수를 입력하세요: ");
-    fgets(str, sizeof(str), stdin);
-    //stdin은 표준 입력 스트림
-    sscanf_s(str, "%d", &num);
-    //값을 str로 받고, 해당 문자열을 정수형으로 바꾼 뒤 &num에 저장함.
+    fgets(str, sizeof(str) - 1, stdin);
+    // stdin은 표준 입력 스트림
+    sscanf(str, "%d", &num);
+    // 값을 str로 받고, 해당 문자열을 정수형으로 바꾼 뒤 &num에 저장함.
     printf("입력된 정수: %d\n", num);
     printf("입력된 문자열: %s\n", str);
 
-  
     char numStr[20];
-    sprintf_s(numStr, sizeof(numStr), "%d", num);
-    //정수 num값도 출력도 하고, 문자열로 변환하여 numStr 버퍼에 저장하는 로직
+    sprintf(numStr, "%d", num);
+    // 정수 num값도 출력도 하고, 문자열로 변환하여 numStr 버퍼에 저장하는 로직
 
     printf("정수를 문자열로 변환한 결과: %s\n", numStr);
 

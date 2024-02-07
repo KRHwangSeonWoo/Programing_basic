@@ -1,0 +1,182 @@
+[클래스의 완성]
+
+
+1. 정보은닉
+만약 객체의 매개 변수가 특정한 조건을 갖춰야 한다면 멤버 변수를 private로 하여 함수를 통해 초기화할 수 있도록 하는 것이 좋다.
+main 함수에서 객체를 생성하고 직접 값을 할당하므로써 조건의 맞지 않는 값이 들어갈 수 있기 때문
+
+즉, 멤버변수는 private로 선언하여 다른 곳에서 접근하지 못하도록 하고 오직 set 함수에서만 맴버변수 값을 할당하도록 하는 것임
+#####################################################################################
+#include<iostream>
+
+class PublicAge{
+public:
+    int age;
+};
+
+class PricateAge{
+private:
+    int age;
+
+public:
+    void setAge(int age){
+        if (age < 0) {
+            std::cout << "잘못된 값";
+            return;
+        }
+        else {
+            age = age;
+        }
+
+    }
+
+};
+
+int main() {
+    //잘못된 값이 들어갈수있음
+    PublicAge age1;
+    age1.age = -1;
+
+    PricateAge age2;
+    age2.setAge(1);
+    age2.setAge(-1);
+}
+#####################################################################################
+
+
+
+
+
+
+
+
+
+
+2. const 함수
+객체의 맴버변수값을 변경하는 시도가 있으면 에러를 띄운다.
+ex) 정보은닉에서 맴버변수의 값을 호출하는 get함수와 set 함수가 있으면 get 함수같은 경우 맴버변수의 값이 변경되면 안되기에 실수를 예방하고자 const 함수로 선언한다.
+#const 함수 안에 또다른 함수를 호출할때 해당 함수도 const로 선언되어야 에러가 안뜸
+#####################################################################################
+#include<iostream>
+
+class PricateAge{
+private:
+    int age;
+
+public:
+    void setAge (int age){
+        if (age < 0) {
+            std::cout << "잘못된 값";
+            return;
+        }
+        else {
+            age = age;
+        }
+
+    }
+    void getAge() const {
+        std::cout << age;
+        //setAge(10); //에러 발생 -> const 함수 내에 실행되는 다른 함수도 const 선언이 되어야됨
+    }
+
+};
+
+int main() {
+
+}
+#####################################################################################
+
+
+
+
+
+
+
+
+3. 캡슐화
+여러 클래스의 메소드를 한번에 불러오는 방법이다.
+ex) 예를 들어 "게보린"의 경우 두통, 치통, 생리통 완화의 기능을 가지고있다.
+만약 두통 치통 생리통이라는 클래스를 각각 만든 경우, main 함수에서 3개의 클래스의 객체를 전부 불러와서 "**통 완화~"를 출력해야한다.
+하지만 캡슐화를 통해서는 해당 객체의 메소드를 하나의 객체의 메소드로 불러올수있다.
+
+[캡슐화를 사용하지 않을 경우, 게보린을 먹을 때마다 3개 객체의 메소드를 각각 불러와야함 -> 불편] 
+#####################################################################################
+#include<iostream>
+
+class Head {
+public:
+    void headOk() {
+        std::cout << "두통 완화~";
+    }
+};
+
+class Tooth {
+public:
+    void toothOk() {
+        std::cout << "치통 완화~";
+    }
+};
+
+class Sang {
+public:
+    void sangOk() {
+        std::cout << "생리통 완화~";
+    }
+};
+            void main() {
+                Head head;
+                head.headOk();
+                Tooth tooth;
+                tooth.toothOk();
+                Sang sang;
+                sang.sangOk();
+            }
+ //두통 완화~치통 완화~생리통 완화~
+####################################################################################
+
+
+[캡슐화를 사용할 경우 게보린 객체만 생성하여 다른 객체의 메소드 출력] 
+####################################################################################
+#include<iostream>
+
+class Head {
+public:
+    void headOk() {
+        std::cout << "두통 완화~";
+    }
+};
+
+class Tooth {
+public:
+    void toothOk() {
+        std::cout << "치통 완화~";
+    }
+};
+
+class Sang {
+public:
+    void sangOk() {
+        std::cout << "생리통 완화~";
+    }
+};
+
+class Geborin {
+private:
+    Head head;
+    Tooth tooth;
+    Sang sang;
+
+public:
+    void getGeborin() {
+        head.headOk();
+        tooth.toothOk();
+        sang.sangOk();
+    }
+};
+
+
+void main() {
+    Geborin ge;
+    ge.getGeborin();
+}
+####################################################################################

@@ -351,3 +351,44 @@ int main() {
 }
 ####################################################################################
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include <iostream>
+using namespace std;
+
+class test {
+public:
+    int a;
+
+    void print() {
+       printf("%d", a);
+
+}
+
+};
+
+int main() {
+    test* myTest = (test*)malloc(sizeof(test));
+    myTest->a = 10;
+    printf("%d", myTest->a);
+    //10
+    myTest->print();
+    //10
+    free(myTest);
+
+    return 0;
+}
+
+

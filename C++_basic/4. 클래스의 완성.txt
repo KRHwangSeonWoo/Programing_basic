@@ -525,8 +525,7 @@ public:
 
     student& callStudent(int age) {
         student* s1 = new student(age);
-        // s1은 객체의 주소를 가리키며, *s1은 객체를 가리킴
-        std::cout << s1 << "\n";
+	std::cout << s1 << "\n";
         return *s1;
     }
 

@@ -1629,31 +1629,85 @@ int main() {
 
 
 13. 객체의 묵시적 변환과 이것을 막기위한 explicit
-객체의 묵시적 변환이란 객체를 선언할 때, student s1 = s2;로 코딩을 하더라도 결국엔
-student s1(s2)로 변환된다는 것이다. (매개변수가 하나일때)
+explicit은 생성자에 사용된다.
 
-근데 묵시적 형변환은 왜 막는거야? -> 모르겠다 이건 내일 하자
-->
-int a = 10;
+*******************************************
+class {
+int age;
+Student(int age) {
+	this->age = age;
+}
+void printStudent(Student s1) {
+	std::cout << s1.age;
+}
+}
+*******************************************
+위 에서 s1.printStudent(10)을 호출한 경우, 일반적으로 에러가 난다고 생각한다.
+(Stduent 형과 int 형은 다르기에)
+하지만 에러가 나지 않는다. 
 
+우리가 10의 매개변수를 넣으면 아래와 코드가 똑같아진다.
+Student s1 = 10 -> Student s1(10);
+-> s1에 int 형으로 매개변수를 받는 생성자가 있기에 정상적으로 코드가 동작한다.
 
-*이해를 위해 아래 예시를 보자.
-####################################################################################
+이를 허용해도 상관은 없지만 실수를 할 수 있고, 가독성이 떨어진다.
+그렇기에 explicit을 사용하여 이런 형변환을 막을 수 있다.
+
+ 
+[예제]
+##################################################################
 #include<iostream>
 
-class student {
+class Student {
 public:
 	int age;
 
-	student(int age) {
+	Student(int age) {
 		this->age = age;
 	}
+
+	void printStudent(Student s1) {
+		std::cout << s1.age;
+	}
+
 };
 
 int main() {
-	student s1 = 3; //매개변수가 하나일때는 이렇게 사용가능하기도함 (두개 이상 불가)
-	//위처럼 선언 시 아래처럼 묵시적으로 변환됨
-	//stduent s1(3);
+	Student s1(10);
+	s1.printStudent(20);
+	//20
+	std::cout << s1.age;
+	//10
+
 
 }
-####################################################################################
+##################################################################
+
+
+
+
+[explicit 사용 예제]
+##################################################################
+#include<iostream>
+
+class Student {
+public:
+	int age;
+
+	explicit Student(int age) {
+		this->age = age;
+	}
+
+	 void printStudent(Student s1) {
+		std::cout << s1.age;
+	}
+
+};
+
+int main() {
+	Student s1(10);
+	//s1.printStudent(20); 에러
+	s1.printStudent(s1);
+	//10
+}
+##################################################################

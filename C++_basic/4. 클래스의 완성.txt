@@ -1646,7 +1646,7 @@ void printStudent(Student s1) {
 (Stduent 형과 int 형은 다르기에)
 하지만 에러가 나지 않는다. 
 
-우리가 10의 매개변수를 넣으면 아래와 코드가 똑같아진다.
+우리가 printStudent에 10의 매개변수를 넣으면 매개변수는 아래와 코드가 똑같아진다.
 Student s1 = 10 -> Student s1(10);
 -> s1에 int 형으로 매개변수를 받는 생성자가 있기에 정상적으로 코드가 동작한다.
 

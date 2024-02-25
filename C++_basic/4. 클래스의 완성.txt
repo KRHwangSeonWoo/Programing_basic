@@ -1784,7 +1784,7 @@ public:
 		std::cout << "소멸자\n";
 	}
 
-	/* -> 아래 코드를넣으면 해결됨
+	/* -> 객체의 깊은 복사
 	student(const student& copy) : age(copy.age) {
         int leng = strlen(copy.name) + 1;
         name = new char[leng];

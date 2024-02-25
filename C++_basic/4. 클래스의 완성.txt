@@ -1780,7 +1780,7 @@ public:
 	}
 
 	~student() {
-		delete[]name; //new로 생성한 것은 반드시 delete해줘야 함
+		delete[]name; //new로 생성한 것은 반드시 delete해줘야 함 -> 만약에 delete를 안해줄경우, 아래 코드에서 정상적으로 "hwang"이 출력됨 하지만 기본적으로 메모리 해체를 해줘야함
 		std::cout << "소멸자\n";
 	}
 

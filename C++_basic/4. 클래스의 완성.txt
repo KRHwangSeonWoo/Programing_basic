@@ -1711,3 +1711,79 @@ int main() {
 	//10
 }
 ##################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+14. 디폴트 복사 생성자 문제점 *** 꼭 알자
+클래스 중 매개변수로 포인터로 가지고, 디폴트 복사 생성자를 이용하여 객체를 새로 생성한 후 새로 만든 객체나 원형 객체를 삭제할 경우 문제가 발생할 수 있다.
+설명하기 이전 디폴트 복사 생성자는 멤버변수의 *값을 복사하는 것이다.
+(또한 멤버변수를 정의할 때 new를 사용하면 소멸자에 해당 변수를 반드시 delete해주자)
+
+***s1, s2 객체가 있고, 아래의 코드와 같다는 것을 가정
+student s1(10,"hwang");
+student s2 = s1;
+
+[메모리 구조]
+s1
+age -> 10
+*name -> A
+
+s2
+age -> 10
+*name -> A
+
+name 문자열 주소(A) -> hwang
+
+
+*만약에 s1 객체가 삭제된다면 
+s2가 바라보고 있는 A 메모리또한 해체된다.
+s2가 A에 대해 접근했을 때 의도치 않은 동작을 초래할 수 있음
+
+##################################################################
+#include<iostream>
+
+class student {
+public:
+	int age;
+	char* name;
+
+	student(int copyAge, const char *copyName) {
+		age = copyAge;
+		int leng = strlen(copyName) + 1;
+		name = new char[leng];
+		strcpy_s(name, leng, copyName);
+	}
+
+	~student() {
+		delete[]name; //new로 생성한 것은 반드시 delete해줘야 함
+		std::cout << "소멸자\n";
+	}
+
+};
+
+int main() {
+	student *s1 = new student(10, "hwang");
+	student s2 = *s1;
+
+	delete s1;
+
+	std::cout << s2.age;
+	std::cout << s2.name;
+
+	//소멸자
+	//10硼硼硼硼硼
+
+
+}
+##################################################################

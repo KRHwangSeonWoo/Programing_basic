@@ -1,0 +1,341 @@
+1. 복사 생성자
+복사 생성자를 설명하기 이전에 여러 배경지식을 설명하려한다.
+복사 생성자는 객체 자체를 복사하는 것이 아닌 값만을 복사하는 생성자이다.
+이또한 클래스에 정의되지 않으면 자동으로 컴파일러가 생성한다.
+
+
+
+1-1) C++의 초기화 방식!
+C++에서 int a = 10과 int a(10)은 같은 이야기다.
+int &a = b, int &a(b);
+
+그럼 객체에서의 초기화 방식은 어떠할까?
+SoSimple s1;
+SoSimple s2 = s1;
+->
+SoSimple s1(s2)인 형태이다.
+* 위 형태를 풀어쓰면 아래와 같다.
+ • SoSimple형 객체를 생성해라.
+ • 객체의 이름은 sim2로 정한다.
+ • siml을 인자로 받을 수 있는 생성자의 호출을 통해서 객체생성을 완료한다.
+
+여기서 모든 객체는 생성자를 호출해야한다. 즉 객체를 인수로하는 생성자가 있어야한다! (s2를 매개변수로 받는!)
+근데 여기서 s2을 생성할때 student에 참조 변수를 return하는 생성자를 만들었을까?
+-> 아니다, 우리는 만들어 사용하지 않았다.
+default 생성자처럼 객체의 참조값을 반환하는 생성자가 없다면 컴파일러가 자동 생성함
+
+
+[student 클래스에 student 객체를 받고 해당 객체 참조값을 반환하는 생성자가 없음!]
+####################################################################################
+#include<stdio.h>
+
+class student {
+	int age;
+};
+
+int main() {
+	student s1;
+	student s2(s1); //여기 주목!
+}
+####################################################################################
+
+-> 실제 컴파일 시 추가되는 생성자
+####################################################################################
+#include<stdio.h>
+
+class student {
+public:
+	int age;
+
+	student() {
+
+	}
+	/* 자동으로 생성되는 복사 생성자!
+	student( student& copy) : age(copy.age) {
+	
+	}
+	*/
+	
+};
+
+int main() {
+	student s1;
+	s1.age = 10;
+	student s2(s1);
+	//student s2 = s1;와 같은 소리
+}
+####################################################################################
+
+
+
+
+
+
+2. 객체의 묵시적 변환과 이것을 막기위한 explicit
+explicit은 생성자에 사용된다.
+
+*******************************************
+class {
+int age;
+Student(int age) {
+	this->age = age;
+}
+void printStudent(Student s1) {
+	std::cout << s1.age;
+}
+}
+*******************************************
+위 에서 s1.printStudent(10)을 호출한 경우, 일반적으로 에러가 난다고 생각한다.
+(Stduent 형과 int 형은 다르기에)
+하지만 에러가 나지 않는다. 
+
+우리가 printStudent에 10의 매개변수를 넣으면 매개변수는 아래와 코드가 똑같아진다.
+Student s1 = 10 -> Student s1(10);
+-> s1에 int 형으로 매개변수를 받는 생성자가 있기에 정상적으로 코드가 동작한다.
+
+이를 허용해도 상관은 없지만 실수를 할 수 있고, 가독성이 떨어진다.
+그렇기에 explicit을 사용하여 이런 형변환을 막을 수 있다.
+
+ 
+[예제]
+##################################################################
+#include<iostream>
+
+class Student {
+public:
+	int age;
+
+	Student(int age) {
+		this->age = age;
+	}
+
+	void printStudent(Student s1) {
+		std::cout << s1.age;
+	}
+
+};
+
+int main() {
+	Student s1(10);
+	s1.printStudent(20);
+	//20
+	std::cout << s1.age;
+	//10
+
+
+}
+##################################################################
+
+
+
+
+[explicit 사용 예제]
+##################################################################
+#include<iostream>
+
+class Student {
+public:
+	int age;
+
+	explicit Student(int age) {
+		this->age = age;
+	}
+
+	 void printStudent(Student s1) {
+		std::cout << s1.age;
+	}
+
+};
+
+int main() {
+	Student s1(10);
+	//s1.printStudent(20); 에러
+	s1.printStudent(s1);
+	//10
+}
+##################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3. 디폴트 복사 생성자 문제점과 객체의 깊은 복사 *** 꼭 알자
+클래스 중 매개변수로 포인터로 가지고, 디폴트 복사 생성자를 이용하여 객체를 새로 생성한 후 새로 만든 객체나 원형 객체를 삭제할 경우 문제가 발생할 수 있다.
+설명하기 이전 디폴트 복사 생성자는 멤버변수의 값을 복사하는 것이다.
+(또한 멤버변수를 정의할 때 new를 사용하면 소멸자에 해당 변수를 반드시 delete해주자)
+
+***s1, s2 객체가 있고, 아래의 코드와 같다는 것을 가정
+student s1(10,"hwang");
+student s2 = s1;
+
+[메모리 구조]
+s1
+age -> 10
+*name -> A
+
+s2
+age -> 10
+*name -> A
+
+name 문자열 주소(A) -> hwang
+
+
+*만약에 s1 객체가 삭제된다면 
+s2가 바라보고 있는 A 메모리또한 해체된다.
+s2가 A에 대해 접근했을 때 의도치 않은 동작을 초래할 수 있음 (age(10)은 문제 X)
+
+-> 해결방법
+
+객체의 깊은 복사를 통해 단순히 값을 복사하는 것이 아닌
+메모리를 새로할당한다.
+*깊은 복사-> 객체의 깊은 복사(Deep Copy)는 객체가 다른 객체로 복사될 때, 해당 객체가 참조하고 있는 모든 동적으로 할당된 자원(예: 메모리)을 새로운 객체로 복사하는 것을 말합니다.
+
+
+
+
+아래 예제로 알 수있는 것
+1) 객체 멤버변수를 new로 생성했으면, 소멸자에 delete를 추가하자 (객체든 아니든 공통)
+2) 디폴트 복사 생성자를 사용할 경우, 아래와 같이 값만 복사하여 사용할 경우 문제점이 있을 수 있다는 것을 인식하자 (포인터로 하는 멤버변수가 있고, 깊은 복사를 하지 않은 생성자를 사용해 객체가 만들어지고, 객체원형이나 복사된 객체가 삭제된 경우)
+3) 2번일 경우, 객체의 깊은 복사로 해결할 수 있다는 것을 인식하자
+
+##################################################################
+#include<iostream>
+
+class student {
+public:
+	int age;
+	char* name;
+
+	student(int copyAge, const char *copyName) {
+		age = copyAge;
+		int leng = strlen(copyName) + 1;
+		name = new char[leng];
+		strcpy_s(name, leng, copyName);
+	}
+
+	~student() {
+		delete[]name; //new로 생성한 것은 반드시 delete해줘야 함 -> 만약에 delete를 안해줄경우, 아래 코드에서 정상적으로 "hwang"이 출력됨 하지만 기본적으로 메모리 해체를 해줘야함
+		std::cout << "소멸자\n";
+	}
+
+	/* -> 객체의 깊은 복사
+	student(const student& copy) : age(copy.age) {
+        int leng = strlen(copy.name) + 1;
+        name = new char[leng];
+        strcpy_s(name, leng, copy.name);
+	*/    
+
+}
+
+};
+
+int main() {
+	student *s1 = new student(10, "hwang");
+	student s2 = *s1;
+
+	delete s1;
+
+	std::cout << s2.age;
+	std::cout << s2.name;
+
+	//소멸자
+	//10硼硼硼硼硼
+
+
+}
+##################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4. 객체의 return은 임시객체
+예를 들어 객체를 매개변수로 받고 객체를 return하는 함수가 있다고 가정한다.
+이때 호출한 객체와 매개변수로 받는 객체와 return하는 임시객체의 인스턴스는 각각 다르다.
+즉, 모두 복사 생성자를 통해 호출된다. (return 시에는 임시객체)
+* 매개변수로 받는 객체 또한 호출한 객체와 다르다는 것은 익히 알것이다 (복사 생성자로 새로 생성된 객체)
+
+정리하자면 이렇다.
+아래의 코드가 있다고 가정한다.
+******************************
+Student returnobj(Student obj /* -> Student obj = objcopy*/) {
+	return obj;
+}
+
+returnobj(obj).printInfo();
+******************************
+-> returnobj()의 return값이 임시 객체이다.
+(즉, 풀어쓰면 Student 임시객체= s1.returnobj(obj)임 -> Student 임시객체 = obj -> Student 임시객체(obj)
+
+
+[아래 예제는 임시객체에 멤버변수에 값을 더하고 출력한 값과 s2 인스턴스의 값을 출력한 값이 다른 것을 보여줌]
+########################################################
+#include<iostream>
+
+class Student {
+public:
+	int num;
+
+	/* -> 203040이 출력됨, 호출한 객체, 매개변수 객체, return하는 임시객체를 동일하게 맞춰야함
+	//만약에 Student return ~이런식으로 반환형에 &가 없으면, 함수내에서 로직에서는 호출한 객체로 사용되지만
+	//반환 이후 임시 객체는 최초의 호출한 객체가 아닌 새로운 객체로 사용됨
+	Student& returnobj(Student& obj) {
+		return obj;
+
+	}
+	*/
+
+	Student returnobj(Student obj) {
+		return obj;
+
+	}
+
+
+	Student addNum(int n) {
+		num = num + n;
+		return *this;
+
+	}
+
+	void showData() {
+		std::cout << num;
+	}
+
+};
+
+int main() {
+
+	Student s1;
+	Student s2;
+	s1.num = 10;
+	s2.num = 20;
+	s1.addNum(20).showData();
+	//30
+	s1.returnobj(s2).addNum(20).showData();
+	//40
+	std::cout << s2.num;
+	//20
+
+}
+########################################################
+
+
+

@@ -1839,7 +1839,7 @@ Student returnobj(Student obj /* -> Student obj = objcopy*/) {
 
 returnobj(obj).printInfo();
 ******************************
--> returnobj()의 return값이 임시 객체이다.
+-> returnobj()의 return값이 임시 객체이다 <-> 매개변수 obj와 또다른 객체 (값만 복사)
 (즉, 풀어쓰면 Student 임시객체= s1.returnobj(obj)임 -> Student 임시객체 = obj -> Student 임시객체(obj)
 
 

@@ -170,7 +170,7 @@ int main() {
     //2째 객체입니다. (복사 생성자)
     Student s3 = s1;
     //3째 객체입니다. (복사 생성자)
-    Student s4 = s3.StudentReturn(s2);
+    Student s4 = s3.StudentReturn(s2); // -> 헷가리면 복사 생성자 다시 봐라
     //4째 객체입니다. (복사 생성자) -> Student s4(임시객체)
     //5째 객체입니다. (복사 생성자) -> 매개변수 시 객체 
     //6째 객체입니다. (복사 생성자) -> return (임시객체)

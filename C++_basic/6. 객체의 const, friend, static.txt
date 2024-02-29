@@ -112,7 +112,7 @@ int main() {
 
 
 
-3. static
+3. static 멤버변수
 
 우선 C에서의 static 변수의 의미를 정리하자.
 전역변수에 선언된 static의 의미

@@ -1,0 +1,146 @@
+[7. 상속의 이해]
+상속이란 다른 클래스의 정보를 특정 클래스로 물려주는 것이다.
+즉 A 클래스가 B클래스를 상속받게 되면 A 클래스는 B 클래스의 모든 멤버를 물려 받는다.
+
+[상속의 문법]
+###############################
+class Student : public Person {
+
+}
+###############################
+
+##############################################################
+#include<iostream>
+
+class Person {
+
+public:
+	int publicAge;
+
+	Person(int age) : privateAge(age) {
+		std::cout << "Person int 생성자\n";
+	}
+
+
+	Person(){
+		std::cout << "Person default 생성자\n";
+	}
+
+
+	void showInfo() {
+		std::cout << this->privateAge << " Person의 privateAge 값\n";
+	}
+
+private:
+	int privateAge;
+
+
+};
+
+class Student : public Person {
+
+public:
+
+	Student(){
+		std::cout << "student default 생성자\n";
+
+	}
+	Student(int age, int grade) : Person(age), grade(grade){
+		std::cout << "student int 생성자\n";
+
+	}
+
+	 int grade;
+
+};
+
+int main() {
+	Student s1;
+	//Person default 생성자
+	//student default 생성자
+	
+	Student s2(20, 5);
+	//Person int 생성자
+	//student int 생성자
+
+	s2.showInfo();
+	//20 Person의 privateAge 값
+
+	std::cout << "-------------------------------------\n";
+
+	Person* p1 = new Student();
+	//p1->grade = student 멤버에 대한 20 접근이 불가
+	//Person int 생성자
+	//student int 생성자
+
+	std::cout << sizeof(p1);
+	//히지만 student, person 클래스의 멤버변수 만큼 메모리를 할당 받음
+	//8
+
+	//Student* s3 = new Person(); 에러
+
+	/*
+	Stduent 소멸자
+	Person 소멸자
+	Stduent 소멸자
+	Person 소멸자
+	*/
+	
+	
+
+}
+##############################################################
+
+
+1) 자식 클래스 객체의 구성 (Student)
+#Student 객체의 구성
+1. Student 자식 멤버
+2. Univ 부모 멤버
+-> Student 객체안에 Univ 부모의 멤버를 상속받아 부모의 멤버를 호출할 수 있게 된다.
+
+2) 생성자 호출
+자식 클래스로 객체를 만들 때 디폴트로 멤버 이니셔라이즈를 통한 부모 생성자가 호출된다. (무조건, 명시를 안하면 default 생성자 호출)
+그리고 만약에 부모 클래스의 멤버변수를 초기화하고 싶다면 생성자의 멤버 이니셔라이즈를 커스터마이징하면 된다.
+(직접 호출도 가능)
+->
+자식 클래스의 생성자가 호출이 되면 컴파일러는 자동적으로 부모 생성자를 호출한다. (아래와 같이)
+위 예제에도 아래와 똑같은 결과를 확인할 수 있다.
+---------------------------------------------------------------
+Student(){
+}
+->
+Student() : Person(){
+}
+---------------------------------------------------------------
+
+#호출 순서는 아래와 같다.
+1. 부모클래스 생성자 호출
+2. 자식 생성자 생성자 호출
+
+
+3) 부모의 private 멤버변수의 상속
+결론부터 말하자면 자식은 부모의 private 멤버도 상속 받는다. (모든 멤버를 상속받음)
+마찬가지로 private 값을 불러오기위해서는 public 메소드를 통해 값을 불러오면 된다.
+
+4) 소멸자 호출 순서
+1. 자식 소멸자 호출
+2. 부모 소멸자 호출 
+
+
+*** 엥? 생성자를 2개 호출한다고? 그러면 하나의 객체에 인스턴스가 2개?
+맞다. Student 객체는 두개의 인스턴스를 가진다 (Student, Person)
+아래 다형성에서 배우겠지만 위 코드에서 Person* p1 = new Student();이 코드가 있다.
+해석하자면 인스턴스를 2개 생성한다. (Student, Person). 하지만 객체의 형태가 Person이기에 Person 멤버에만 접근이 가능하다.
+여기서 Person이 아닌 Student *로 정의한다면 Stduent는 Person의 멤버를 상속하기에 Stduent 형안에 Person의 멤버가 포함되기에 Person의 멤버도 호출이 가능한것이다.
+
+
+
+
+
+
+
+
+
+
+
+

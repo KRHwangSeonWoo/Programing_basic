@@ -226,6 +226,9 @@ protected:
 class Student : private Person {
 
 	/*
+
+	접근불가:
+		int private = 20;
 	private:
 		int publicAge = 10;
 		int protectedAge = 30;
@@ -259,6 +262,9 @@ protected:
 class Student : private Person {
 
 	/*
+
+	접근불가:
+		int private = 20;
 	procteced:
 		int publicAge = 10;
 		int protectedAge = 30;
@@ -294,6 +300,9 @@ protected:
 class Student : private Person {
 
 	/*
+
+	접근불가:
+		int private = 20;
 	public:
 		int publicAge = 10;
 	protected:

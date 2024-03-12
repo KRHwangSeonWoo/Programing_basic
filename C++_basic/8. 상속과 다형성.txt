@@ -80,3 +80,39 @@ int main() {
 4
 1
 ##########################################################################################
+
+
+
+
+
+
+#include<iostream>
+
+class animal {
+public:
+    virtual void sound() {
+        std::cout << "동물 소리를 내다." << std::endl;
+    }
+};
+
+class Student : public animal {
+public:
+    void sound()  {
+        std::cout << "학생이 말을 합니다." << std::endl;
+    }
+};
+
+int main() {
+    animal* a1 = new animal(); // animal 클래스의 객체를 생성합니다.
+    a1->sound(); // 동물 소리를 내다.
+
+    animal* a2 = new Student(); // Student 클래스의 객체를 생성합니다. 
+    a2->sound(); // 학생이 말을 합니다.
+
+    Student s1;
+
+    animal* a3 = &s1;
+
+    a3->sound();
+    return 0;
+}

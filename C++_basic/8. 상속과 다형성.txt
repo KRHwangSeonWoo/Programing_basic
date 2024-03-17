@@ -238,3 +238,75 @@ int main() {
     return 0;
 }
 ##########################################################################################
+
+
+
+
+
+
+
+
+
+
+4. 순수 가상 함수와 추상 클래스
+특정 클래스가 기초 클래스로 해당 기초 클래스로 객체를 만들어 사용하지 않을때 객체 생성을 막아야 한다.
+이경우 virtual void display() = 0;으로 선언하여 해당 기초 클래스를 상속 받은 모든 클래스가 display를 구현하도록 하고 
+기초 클래스로 객체를 생성하는 것을 막는다.
+
+####################################################################################################################################################################################
+basic 클래스는 객체를 생성하여 사용하지 않는 기초 클래스이다. 그렇기에 순수 가상함수를 통해 추상 클래스로 만들어보자
+*basic 클래스에서 상위 클래스에서 공통적으로 정의할 display 함수를 순수 가상함수로 선언한다.
+-> 1) basic 클래스로 객체를 생성할 경우 에러 발생
+-> 2) 자식 클래스에서 순수 가상 함수를 구현하지 않을 경우 에러 발생
+####################################################################################################################################################################################
+#include <iostream>
+#include <cstring>
+
+class basic {
+public:
+    int basic_info;
+
+    
+    basic(int info) : basic_info(info) {};
+
+    virtual void  display() = 0;
+
+
+};
+
+class application : public basic {
+    char* application_name;
+
+public:
+    
+    application(int info, const char* name) : basic(info) {
+        application_name = new char[strlen(name) + 1]; 
+        strcpy(application_name, name);
+    }
+
+
+    void display() {
+        std::cout << "Basic Info: " << basic_info << std::endl;
+        std::cout << "Application Name: " << application_name << std::endl;
+    }
+
+    ~application() {
+    
+        delete[] application_name;
+    }
+
+
+};
+
+int main() {
+    application myApp(123, "MyApp");
+
+    myApp.display();
+
+    //에러 발생
+    //basic b1(10);
+
+
+    return 0;
+}
+

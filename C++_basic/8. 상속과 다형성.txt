@@ -206,37 +206,46 @@ virtual void sound() {
 }
 
 -> 이렇게 하면 참조 자료형이 부모라도 객체가 자식이면 자식의 메소드가 호출됨
+*최상위 함수에만 virtual을 선언해도 됨, 그렇기에 나머지 자식 함수에는 virtual을 선언하지 않아도 됨
+하지만 자식에 virtual 선언을 넣어서 함수가 가상함수임을 알리는 것이 좋다.
 --------------------------------------------------------------------------------
 
 
 ##########################################################################################
 #include<iostream>
 
-class animal {
+
+
+class First {
 public:
-      virtual void sound() {
-        std::cout << "동물 소리를 내다." << std::endl;
-    }
+	virtual void SimpleFunc() { std::cout << "First" << std::endl; }
 };
 
-class Student : public animal {
+class Second : public First {
 public:
-    void sound() {
-        std::cout << "학생이 말을 합니다." << std::endl;
-    }
+	virtual void SimpleFunc() { std::cout << "Second" << std::endl; }
 };
 
-int main() {
 
-    animal* a1 = new animal(); // animal 클래스의 객체를 생성합니다.
-    a1->sound(); // 동물 소리를 내다.
+class Third : public Second {
+public:
+	void SimpleFunc() { std::cout << "Third" << std::endl; }
+};
 
-    animal* a2 = new Student(); // Student 클래스의 객체를 생성합니다. 
-    a2->sound(); // 학생이 말을 합니다.
+int main(void)
+{
+	First* ptr = new First();
+	ptr->SimpleFunc(); // 아래에 동일한 문장이 존재한다.
+	delete ptr;
+	ptr = new Second();
+	ptr->SimpleFunc(); // 위에 동일한 문장이 존재한다.
+	delete ptr;
+	ptr = new Third();
+	ptr->SimpleFunc(); // 위에 동일한 문장이 존재한다.
 
-
-    return 0;
+	return 0;
 }
+
 ##########################################################################################
 
 

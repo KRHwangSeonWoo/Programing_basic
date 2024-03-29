@@ -107,5 +107,28 @@ int 변수에 ++이나 --를 하면 1씩 증감한다.
 마찬가지로 단항 연사자 오버로딩을 통해 진행하면 된다.
 
 
+#include<iostream>
+
+class Number {
+public:
+
+    int number;
+
+    Number(int number = 1) : number(number) {
+
+    }
+};
+
+Number operator++(Number& num1) {
+    num1.number += 1;
+    return num1;
+}
+
+int main() {
+    Number num1;
+    ++(++num1);
+    std::cout << num1.number;
+    //3
+}
 
 

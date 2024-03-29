@@ -140,3 +140,38 @@ int main() {
 
 
 C++ 표준은 임시 객체를 비 const 참조로 전달하는 것을 허용하지 않는데, 이는 여러 이유가 있습니다.
+
+
+
+
+
+
+
+
+
+#include<iostream>
+
+class Number {
+public:
+	int num;
+
+	Number returnMyself() {
+		return *this;
+	}
+
+	Number showNumber(Number& num) {
+		std::cout << num.num;
+	}
+
+
+};
+
+int main() {
+	Number n1;
+
+	n1.showNumber(n1.returnMyself());
+}
+
+
+
+const를 붙이지 않거나 참조자를 빼면 에러 X

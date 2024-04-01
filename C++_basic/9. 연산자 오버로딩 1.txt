@@ -251,3 +251,67 @@ int main() {
 
 
 
+
+
+
+3) 다른 자료형끼리의 연산
+다른 자료형끼리의 연산자 오버라이딩을 통한 호출에서는 순서가 중요하다.
+Num num2 = num1 + 20; 인 경우 num1.operator+(20)로 호출되기에 순서가 바뀌면
+20.operator+(num1)로 해석되어 문제가 발생된다.
+############################################################
+#include<iostream>
+
+class Num {
+public:
+	int num;
+	
+	Num() :num(0) {
+
+	}
+
+	Num& operator + (int num2) {
+		this->num += num2;
+		return *this;
+	}
+};
+
+
+int main() {
+
+	Num num1;
+	Num num2 = num1 + 20;
+	//Num num3 = 20 + num1; -> 에러
+}
+############################################################
+
+
+-> 위 예제에서 순서를 굳이 바꾸고 싶다면 전역함수 연산자 오버라이딩으로 바꿔서 사용하면 된다.
+
+############################################################
+#include<iostream>
+
+class Num {
+public:
+	int num;
+	
+	Num() :num(0) {
+
+	}
+};
+
+Num& operator + (int num2, Num& num) {
+	num.num += num2;
+	return num;
+}
+
+int main() {
+
+	Num num1;
+	//Num num2 = num1 + 20;
+	Num num3 = 20 + num1;
+}
+############################################################
+
+
+
+

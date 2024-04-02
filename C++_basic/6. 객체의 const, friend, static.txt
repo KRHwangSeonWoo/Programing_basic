@@ -53,6 +53,31 @@ int main() {
 #######################################################
 
 
+함수의 const 객체 반환
+[const로 반환된 객체로 값을 변경 시 에러나는 예제]
+#######################################################
+#include <iostream>
+
+class ConstObject {
+public:
+	int age;
+
+	const ConstObject& operator++() {
+		this->age += 1;
+		return *this;
+	}
+
+};
+
+int main() {
+	ConstObject obj1;
+	obj1.age = 10;
+
+	++(++obj1); // -> 에러
+
+}
+#######################################################
+
 
 
 

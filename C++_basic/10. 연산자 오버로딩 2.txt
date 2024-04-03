@@ -1,0 +1,200 @@
+1. 대입 연산자
+복사생성자를 통해 대입 연산자를 이해해보자
+
+*복사 생성자 특성
+대입 연산자를 알기 위해서 먼저 복사생성자에 대해 간략히 말하겠다.
+1) 정의하지 않으면 디폴트 복사 생성자가 삽입됨
+2) 디폴트 복사생성자는 얕은 복사를 진행함
+3) 깊은 복사를 위해서는 직접 정의해야 함
+
+*디폴트 대입 연산자 특성
+1) 정의하지 않으면 디폴트 대입 연산자가 삽입
+2) 디폴트 대입 연산자는 얕은 복사를 진행함
+3) 깊은 복사를 위해서는 직접 정의해야 함
+
+-> 이처럼 복사 생성자와 디폴트 대입 연산자는 매우 비슷하다.
+
+*아니 근데, 복사생성자를 사용할 때 대입 연산자를 필요로하는데 복사생성자를 통해 객체가 복사가 되는지, 대입 연산자를 통해 복사가 되는지
+그 구분하는 기준이 뭐야?
+-> 복사생성자와 대입 연산자의 호출 범위
+
+1) 복사 생성자 호출: 객체 선언과 [동시에] 다른 객체로 초기화
+Student s1;
+Student s2 = s1;
+
+2) 대입 연산자 호출: 객체 선언 [후] 다른 객체로 초기화
+Student s1(10);
+Student s2(20);
+s1 = s2;
+
+###############################################################
+#include<iostream>
+
+class Student{
+public:
+
+	int age;
+	Student() {
+
+	}
+
+	Student(Student& s) : age(s.age) {
+		std::cout << "복사 생성자 호출\n";
+	}
+
+
+	Student& operator=(Student& s) {
+		std::cout << "대입 연산자 호출\n";
+		this->age = s.age;
+		return *this;
+	}
+ 
+};
+
+int main() {
+
+	Student s1;
+	s1.age = 10;
+	Student s2;
+	s2.age = 20;
+	s1 = s2;
+	//대입 연산자 호출
+
+
+	Student s3;
+	Student s4 = s3;
+	//복사 생성자 호출
+}
+###############################################################
+
+
+
+
+
+
+2. 디폴트 대입 연산자의 문제점
+이것또한 디폴트 복사 생성자의 문제점과 동일하다 (얕은 복사)
+바로 객체 내 동적으로 메모리를 할당할 때 문제가 발생할 수 있다.
+
+*예를 들어 Student 클래스의 이름을 동적으로 저장한고 s1 객체를 s2로 얕은 복사를 한다고 가정한다.
+그러면 메모리 구조는 아래와 같다.
+***************************
+#######복사 전#######
+[s1]
+int age -> 10
+char *name -> AA 
+
+[s2]
+int age -> 20
+char *name -> BB
+ 
+0XAA
+"hawng"
+0XBB
+"KIM"
+***************************
+->
+***************************
+#######복사 후#######
+[s1]
+int age -> 20
+char *name -> BB
+
+[s2]
+int age -> 20
+char *name -> BB
+
+0XAA
+"hawng"
+0XBB
+"KIM"
+***************************
+
+위처럼 객체 멤버 값이 바뀌면 아래와 같은 문제가 발생할 수 있다.
+
+1) s1, s2 객체를 삭제해도 AA는 delete가 되지 않아 메모리 누수가 발생할 수 있음
+- s1, s2 모두 BB의 값을 가지고 있기에 delete []name 시 BB만이 delete됨 
+
+2) s1 객체에서 BB를 메모리에서 해체하고 또 다시 s2에서 BB를 메모리에서 해체하는데 이미 소멸된 문자열을 또 다시 소멸을 시도하는 문제 발생
+
+[문제가 있는 코드]
+-> s1, s2 객체 소멸해도 kim은 메모리에서 해체되지 않고, s1 삭제 후 s2 객체가 삭제될 경우 이미 소멸된 문자열을 또 다시 소멸 시도하는 문제가 발생한다
+############################################################################
+#include<iostream>
+
+class Student {
+public:
+	int age;
+	char* name;
+	
+
+	Student(int age, const char* copy_name) : age(age){
+		int len = strlen(copy_name);
+		name = new char[len] + 1;
+		strcpy(name, copy_name);
+		
+	
+	}
+};
+
+int main() {
+
+	Student s1(10, "hwang");
+	std::cout << s1.name;
+
+	Student s2(20, "kim");
+	std::cout << s2.name;
+
+	s1 = s2;
+}
+############################################################################
+
+
+
+
+
+[문제를 개선한 코드]
+############################################################################
+#include<iostream>
+
+class Student {
+public:
+	int age;
+	char* name;
+	
+
+	Student(int age, const char* copy_name) : age(age){
+		int len = strlen(copy_name);
+		name = new char[len] + 1;
+		strcpy(name, copy_name);
+		
+	
+	}
+
+	Student& operator=(Student& s) {
+		delete[] name;
+		this->age = s.age;
+		this->name = s.name;
+	}
+
+};
+
+int main() {
+
+	Student s1(10, "hwang");
+	std::cout << s1.name;
+
+	Student s2(20, "kim");
+	std::cout << s2.name;
+
+	s1 = s2;
+
+}
+############################################################################
+
+
+
+
+
+
+

@@ -195,6 +195,50 @@ int main() {
 
 
 
+#include<iostream>
 
+class Person {
+public:
+	int age;
+
+	Person(int age) : age(age) {
+
+	}
+	
+};
+
+class Student : public Person {
+public:
+	int studentID;
+
+	Student(int age, int studentID): Person(age), studentID(studentID){
+	}
+
+	Student& operator= (const Student& s) {
+		//age = s.age;
+		studentID = s.studentID;
+		return *this;
+	}
+
+};
+
+int main() {
+
+	Student s1(10, 20);
+	Student s2(30, 40);
+	
+	Student s3 = s2;
+	std::cout << s3.age << s3.studentID;
+	//3040
+	s1 = s2;
+	std::cout << s1.age << s1.studentID;
+	//1040 -> 위에 age=s.age의 주석을 풀거나 Student의 operator= 함수를 주석을 걸면
+	//3040으로 출력됨
+	
+	
+
+
+
+}
 
 

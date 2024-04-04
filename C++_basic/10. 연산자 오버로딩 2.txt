@@ -271,7 +271,7 @@ int main() {
 -> Second 객체 생성 시 First 멤버 초기화 -> First first = ref -> 복사생성자 호출
 
 2) 몸체로 초기화 시 -> 객체 생성자, = 연산자 함수 호출 (2회 호출)
--> Third 객체 생성 시 First 멤버 초기화 -> First first(객체 생성자); First& ref = first; first = ref(= 연산자 함수 호출) -> 객체 생성자, = 연산자 함수 호출 2회 호출
+-> Third 객체 생성 시 First 멤버 초기화 -> First first(객체 생성자); First& ref = first; first = ref(= 연산자 함수 호출) -> 객체 생성자, = 연산자 함수 총 호출 2회 호출
 
 * Third의 "Fist default 생성자 호출"은 Third의 멤버변수 first 객체를 생성할 때 호출되는 것임. (당연한 얘기)
 * 참조자로 객체 매개변수를 받을 때는 생성자호출이 되지 않음. (참조자 정의가 되지 않으면 복사생성자가 호출됨)

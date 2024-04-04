@@ -249,3 +249,89 @@ int main() {
 }
 ############################################################################
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4. 클래스에서 객체를 멤버로 가질 떄 멤버 이니셔라이즈로 초기화하는 것이 효율적인 이유
+1) 멤버이니셔라이즈로 초기화 시 -> 복사 생성자 1번호출 (1회 호출)
+2) 몸체로 초기화 시 -> 객체 생성자, = 연산자 함수 호출 (2회 호출)
+
+* Third의 "Fist default 생성자 호출"은 Third의 멤버변수 first 객체를 생성할 때 호출되는 것임. (당연한 얘기)
+* 참조자로 객체 매개변수를 받을 때는 생성자호출이 되지 않음. (참조자 정의가 되지 않으면 복사생성자가 호출됨)
+* 복사생성자를 정의할 때 참조자로 받는 이유는 참조자로 받지 않을 경우 복사생성자가 loop가 돌기 때문
+############################################################################
+#include<iostream>
+
+class First {
+
+	int num;
+
+public:
+	First() : num(0) {
+		std::cout << "Fist 생성자 호출\n";
+	}
+	
+	First(const First& first) : num(first.num) {
+		std::cout << "Fist 복사 생성자 호출\n";
+	}
+	
+	First& operator=(const First& first)  {
+		std::cout << "First operator= 호출\n";
+		this->num = first.num;
+		return *this;
+	}
+
+};
+
+class Second {
+public:
+	First first;
+
+	Second(First& first) : first(first) {
+	}
+
+};
+
+class Third {
+public:
+	First first;
+
+	Third(First& first)  {
+		this->first = first;
+	}
+
+};
+
+int main() {
+	First f1;
+	std::cout << "***********************\n";
+
+	Second s1(f1);
+	std::cout << "***********************\n";
+
+	Third t1(f1);
+
+
+}
+
+
+Fist default 생성자 호출
+***********************
+Fist 멤버 이니셔라이즈 복사 생성자 호출
+***********************
+Fist default 생성자 호출
+First operator= 호출
+############################################################################

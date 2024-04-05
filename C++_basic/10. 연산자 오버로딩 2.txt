@@ -417,3 +417,87 @@ int main() {
 
 }
 ############################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include<iostream>
+
+class ArrayLengthCheck {
+public:
+	int arr[4];
+	int arrayLen;
+
+	ArrayLengthCheck(int arrayLen) : arrayLen(arrayLen) {
+		
+	}
+
+	int GetArrLen() const { return arrayLen; }
+
+
+	int& operator[] (int idx) {
+		if (idx < 0 || idx >= arrayLen) {
+			std::cout << "배열의 범위를 초과함";
+			exit(1);
+		}
+		return arr[idx]; //멤버 변수의 인덱스 연산자(자료형: 정수 포인터)이기에 일반적인 인덱스 연산자가 적용됨 (ArrayLenthCheck 객체가 인덱스 연산자를 사용한 게 아니라서)
+	}
+
+
+	const int& operator[]  (int idx) const {
+		if (idx < 0 || idx >= arrayLen) {
+			std::cout << "배열의 범위를 초과함";
+			exit(1);
+		}
+		return arr[idx]; //멤버 변수의 인덱스 연산자(자료형: 정수 포인터)이기에 일반적인 인덱스 연산자가 적용됨 (ArrayLenthCheck 객체가 인덱스 연산자를 사용한 게 아니라서)
+	}
+
+
+
+	~ArrayLengthCheck() {
+		delete[]arr;
+	}
+
+	
+};
+
+void showAllData(const ArrayLengthCheck& ref) {
+	int len = ref.GetArrLen();
+	std::cout << ref[0];
+
+}
+
+
+
+int main() {
+	ArrayLengthCheck array1(3);
+	array1[0] = 0;
+	array1[1] = 1;
+	array1[2] = 2;
+
+	std::cout << array1[0] << "\n";
+	std::cout << array1[1] << "\n";
+	std::cout << array1[2] << "\n";
+	std::cout << array1[3] << "\n";
+	/*
+0
+1
+2
+배열의 범위를 초과함
+	*/
+
+}

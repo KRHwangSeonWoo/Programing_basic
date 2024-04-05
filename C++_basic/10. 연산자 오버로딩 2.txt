@@ -439,11 +439,12 @@ int main() {
 
 class ArrayLengthCheck {
 public:
-	int arr[4];
+	int *arr;
 	int arrayLen;
 
 	ArrayLengthCheck(int arrayLen) : arrayLen(arrayLen) {
-		
+		arr = new int[arrayLen];
+
 	}
 
 	int GetArrLen() const { return arrayLen; }
@@ -456,7 +457,6 @@ public:
 		}
 		return arr[idx]; //멤버 변수의 인덱스 연산자(자료형: 정수 포인터)이기에 일반적인 인덱스 연산자가 적용됨 (ArrayLenthCheck 객체가 인덱스 연산자를 사용한 게 아니라서)
 	}
-
 
 	const int& operator[]  (int idx) const {
 		if (idx < 0 || idx >= arrayLen) {

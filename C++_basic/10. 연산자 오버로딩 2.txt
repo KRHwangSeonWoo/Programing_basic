@@ -434,7 +434,7 @@ int main() {
 
 6. const 함수를 이용한 오버로딩의 활용
 void showAllData의 매개변수로 const로 받는 것은 매우 좋은 선택이다. (그냥 출력 함수이기에) -> const 함수 특성 상 내부 로직 안에서 호출하는 모든 함수는 const 함수이어야 한다. -> 하지만 return ref[0]은 ref.operator[]이고 해당 함수는 const 처리되지 않았다
--> 그렇기에 const 처리를 해줬는데 main 함수에서 array1[0] = 0;에서 에러가 발생한다 (값을 수정하기에) -> 그렇기에 int& operator[] (int idx) 함수를 추가하여 return ref[0]가 const가 없는 operator[] 호출하도록 유도한다. 
+-> 그렇기에 const 처리를 해줬는데 main 함수에서 array1[0] = 0;에서 에러가 발생한다 (const 처리된 operator[] 함수의 return에 사용된 함수 operator[] 원형 함수는 const가 아니기에) -> 그렇기에 int& operator[] (int idx) 함수를 추가하여 return ref[0]가 const가 없는 operator[] 호출하도록 유도한다. 
 
 ############################################################################
 #include<iostream>

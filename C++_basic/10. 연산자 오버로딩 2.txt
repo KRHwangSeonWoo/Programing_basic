@@ -504,3 +504,97 @@ int main() {
 
 }
 ############################################################################
+
+
+
+
+
+
+
+
+
+
+
+7. new와 delete 연산자 오버로딩
+new와 delete가 단순한 키워드로 생각할 수 있는데, 이는 분명 연산자이다.
+그렇기에 연산자 오버로딩이 가능하고 이둘을 이용해서 클래스 별로 독특한 객체의 생성과정을 정의할 수 있다.
+하지만 이 둘은 일반적인 연산자 오버로딩과 다를 수 있디.
+
+
+1) new
+Point * ptr = new Point(3,4);에서 new 연산자의 하는 일은 아래와 같다.
+1. 메모리 공간의 할당
+2. 생성자 호출
+3. 할당하고자 하는 자료형에 맞게 반환된 주소 값의 형변환
+
+여기서 2,3 번 작업은 컴파일러에서 진행하는 바꿀 수 없는 고정적인 작업이기에 우리가 코딩으로 오버로딩할 수 있는 작업은 1번밖에 없다.
+즉 메모리 공간 할당에 대해 오버로딩만 가능한 것이다.
+-> void * operator new (size_t size) {...}
+반환형은 반드시 void 포인터여야 하고 매개변수형은 size_t이어야 한다. 그리고 이렇게 오버로딩된 함수는 컴파일러에 의해 호출이 이루어진다.
+
+malloc 함수와 비슷하게 할당한 메모리 크기를 정해주고 return하는 것이 매우 비슷해보인다.
+################################
+void * operator new (size_t size)
+{
+void * adr = new char[size];
+return adr;
+}
+################################
+
+
+
+
+2) delete 연산자 오버로딩
+delete ptr;로 객체의 소멸을 명령하면 컴파일러는 먼저 ptr이 가르키는 객체의 소멸자를 호출하고 그리고 다음의 형태로 정의된 함수에 ptr에 저장된 주소 값을
+전달한다.
+
+void operator delte (void * adr) { ...... }
+
+*소멸자 VS delete 오버로딩 함수
+소멸자: 객체 내부의 멤버 중 동적으로 할당할 변수의 delete를 책임 (이때 delete는 일반적인 delte임, 따로 정의한 delete X -> 왜냐하면 delete가 객체를 delete하는 것이 아니기 때문에 기본 delete가 호출된다)
+delete 오버로딩 함수: 동적으로 생성된 객체의 메모리 소멸
+
+
+############################################################################
+#include<iostream>
+
+class Student {
+
+public:
+
+	int* age;
+
+
+	Student() {
+		age = new int;
+	}
+
+	~Student() {
+		std::cout << "소멸자 delete 호출\n";
+		delete age;
+	}
+
+	void* operator new (size_t size)
+	{
+		void* adr = new char[size];
+		std::cout << "custom new 호출 " << size << "\n";
+		return adr;
+	}
+
+	void operator delete(void* adr) {
+		std::cout << "custom delete 호출";
+		delete adr;
+	}
+};
+
+int main() {
+	Student* s1 = new Student();
+	delete s1;
+
+
+
+}
+############################################################################
+custom new 호출 8
+소멸자 delete 호출
+custom delete 호출

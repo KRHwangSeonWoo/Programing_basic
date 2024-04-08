@@ -603,3 +603,69 @@ custom delete 호출
 
 잠깐!!! Student* s1 = new Student();에서 객체가 생성되지도 않았는데 멤버 함수 operator new를 어떻게 호출한거지?
 -> 우리가 명시하지 않아도 operator new와 operator delete는 static 함수로 간주가 된다. 그렇기에 객체 생성 이전에 멤버함수 호출이 가능한 것이다.
+
+
+
+
+
+
+
+
+
+3) operator[] new, delete
+객체 배열을 생성할 경우 void * operator[] new로 생성하면 된다.
+어려운건 없으니 바로 예제로 들어간다.
+############################################################################
+#include<iostream>
+
+class Student {
+
+public:
+	int age;
+
+
+	void* operator new(size_t size) {
+		std::cout << "oeprator new 호출" << size << "\n";
+		void* adr = new char[size];
+		return adr;
+		}
+
+	void operator delete(void* adr) {
+			std::cout << "oeprator delte 호출"<< "\n";
+			delete[]adr;
+	}
+
+
+
+
+
+	void* operator new[](size_t size){
+		std::cout << "oeprator new [] 호출" << size << "\n";
+		void* adr = new char[size];
+		return adr;
+	}
+
+	void operator delete[](void * adr) {
+		std::cout << "oeprator delte [] 호출";
+		delete[]adr;
+	}
+
+
+
+};
+
+int main() {
+	
+	Student* s1 = new Student();
+	delete s1;
+
+	Student* s2 = new Student[3];
+	delete s2;
+
+}
+############################################################################
+oeprator new 호출4
+oeprator delte 호출
+oeprator new [] 호출12
+oeprator delte 호출
+

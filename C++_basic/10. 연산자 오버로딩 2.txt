@@ -740,8 +740,8 @@ int main() {
 
 이건 하나의 예시일 뿐이고 이 처럼 ->와 *를 오버로딩하여 특정한 로직을 구현할 수 있다는 것이 중요하다.
 
-*SmartPtr* ptr0 = new SmartPtr(); -> 프로그램 종료 시 소멸자 호출 X 
-*SmartPtr ptr1(new Student()); -> 프로그램 종료 시 소멸자 호출 O 
+SmartPtr* ptr0 = new SmartPtr(); -> 프로그램 종료 시 소멸자 호출 X 
+SmartPtr ptr1(new Student()); -> 프로그램 종료 시 소멸자 호출 O 
 ############################################################################
 #include<iostream>
 

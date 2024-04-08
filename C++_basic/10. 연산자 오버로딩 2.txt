@@ -598,3 +598,7 @@ int main() {
 custom new 호출 8
 소멸자 delete 호출
 custom delete 호출
+
+
+잠깐!!! Student* s1 = new Student();에서 객체가 생성되지도 않았는데 멤버 함수 operator new를 어떻게 호출한거지?
+-> 우리가 명시하지 않아도 operator new와 operator delete는 static 함수로 간주가 된다. 그렇기에 객체 생성 이전에 멤버함수 호출이 가능한 것이다.

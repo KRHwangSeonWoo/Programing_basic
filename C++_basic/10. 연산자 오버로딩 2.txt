@@ -669,3 +669,50 @@ oeprator delte 호출
 oeprator new [] 호출12
 oeprator delte 호출
 
+
+
+
+8. 객체 포인터 연산자 오버로딩
+포인터를 기반으로하는 연산자 모두 포인터 연산자라고 한다. 그중 대표적인 포인터 연산자에 대한 오버로딩을 해보자
+
+-> : 포인터가 가르키는 객체의 멤버에 접근
+* : 포인터가 가르키는 객체 자체에 접근
+############################################################################
+#include<iostream>
+ 
+
+class Student {
+public: 
+	int age;
+
+	Student* operator->() {
+		std::cout << " custom Operator ->\n";
+		return this;
+	}
+
+	Student& operator*() {
+		std::cout << " custom Operator *\n";
+		return *this;
+	}// this의 참조자형 반환
+
+	void showData() {
+		std::cout << this->age;
+	}
+
+};
+
+int main() {
+	Student s1;
+	s1.age = 20;
+
+	s1->age;
+	(*s1).age;
+
+	s1->showData();
+}
+############################################################################
+ custom Operator ->
+ custom Operator *
+ custom Operator ->
+20
+

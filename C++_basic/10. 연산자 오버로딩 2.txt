@@ -723,3 +723,77 @@ int main() {
  custom Operator ->
 20
 
+
+
+
+
+
+
+
+
+
+
+9. 스마트 포인터
+예를 들어 아래처럼 객체를 생성할때 동적으로 메모리를 할당하여 사용하지만 포인터로 받지 않게 해서 프로그램이 종료될 떄 소멸자를 자동으로
+호출하도록 해서 delete를 하지 않아도 메모리에 해체 될 수 있도록 할 수 있다.
+이건 하나의 예시일 뿐이고 이 처럼 ->와 *를 오버로딩하여 특정한 로직을 구현할 수 있다는 것이 중요하다.
+
+*SmartPtr* ptr0 = new SmartPtr(); -> 프로그램 종료 시 소멸자 호출 X 
+*SmartPtr ptr1(new Student()); -> 프로그램 종료 시 소멸자 호출 O 
+############################################################################
+#include<iostream>
+
+class Student {
+public:
+
+	int age;
+
+	Student(int age) : age(age) {
+
+	}
+
+};
+
+
+class SmartPtr {
+private:
+	Student* s;
+
+public: 
+
+	SmartPtr(){
+
+	}
+
+	SmartPtr(Student * s) : s(s){
+
+	}
+
+	Student* operator ->() {
+		return s;
+	}
+
+	Student operator *() {
+		return *s;
+	}
+	
+	~SmartPtr() {
+		std::cout << "SmartPTR의 Student 동적 객체 소멸\n";
+		delete s;
+	}
+
+
+};
+
+
+int main() {
+	SmartPtr* ptr0 = new SmartPtr();
+	//프로그램이 종료될 때 소멸자 호출 X (동적으로 할당했기에)
+	SmartPtr ptr1(new Student(20));
+	//SmartPTR의 Student 동적 객체 소멸
+	SmartPtr ptr2;
+	//SmartPTR의 Student 동적 객체 소멸
+	ptr1->age = 20;
+}
+############################################################################
+

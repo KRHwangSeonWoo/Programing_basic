@@ -790,7 +790,7 @@ public:
 
 int main() {
 	SmartPtr* ptr0 = new SmartPtr();
-	//프로그램이 종료될 때 소멸자 호출 X (동적으로 할당했기에)
+	//프로그램이 종료될 때 소멸자 호출 X
 	SmartPtr ptr1(new Student(20));
 	//SmartPTR의 Student 동적 객체 소멸
 	SmartPtr ptr2;

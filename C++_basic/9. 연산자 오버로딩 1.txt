@@ -305,8 +305,6 @@ ostream& operator<<(unsigned int& val);
 
 
 [std::ostream에 Point 객체를 매개변수로 받는 함수가 없기에 전역 함수로 정의된 함수가 호출된다
-또한 오버로딩한 함수 내 "out <<" 은 ostream에 정의된 함수이다. (ostream 내에 정의된 인자값으로 호출하기 때문)]
-
 
 ############################################################
 #include <iostream>
@@ -343,6 +341,53 @@ int main() {
     return 0;
 }
 
+############################################################
+
+
+
+
+
+
+*** 아래 코드에서 클래스 내부에 아래와 같이 operator << 함수가 오버로딩된 것처럼 보이지만 friend 함수로 정의되어 있다.
+즉, operator << 함수는 클래스 멤버가 아닌 전역함수이며 단지 해당 friend함수가 String 클래스 내에 선언을 해줌으로써 해당 클래스의 멤버를 호출할 수 있도록 하는 것이다.
+############################################################
+#include <iostream>
+#include <cstring>
+
+class String {
+private:
+    char* str;
+
+    // Constructor
+    String(const char* s = nullptr) {
+        if (s == nullptr) {
+            str = new char[1];
+            *str = '\0'; // Empty string
+        }
+        else {
+            size_t len = strlen(s) + 1;
+            str = new char[len];
+            strcpy_s(str, len, s); // Copy input string
+        }
+    }
+
+    // Destructor
+    ~String() {
+        delete[] str; // Release memory
+    }
+
+    // Overloading << operator as a non-member friend function
+    friend std::ostream& operator<<(std::ostream& os, const String& s) {
+        os << s.str;
+        return os;
+    }
+};
+
+int main() {
+    String s("Hello, world!");
+    std::cout << "String s: " << s << std::endl;
+    return 0;
+}
 ############################################################
 
 

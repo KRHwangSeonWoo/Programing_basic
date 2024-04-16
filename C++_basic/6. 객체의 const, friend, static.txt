@@ -91,6 +91,11 @@ int main() {
 
 
 2. friends 선언
+
+
+
+1) friend 클래스 
+
 A 클래스, B 클래스 두개가 있다고 가정할고 B클래스가 private 멤버변수를 가지고 있을 때
 A클래스가 B클래스의 private 멤버변수에 접근할 수있도록 하는 것이다. (public도 당연히 접근 가능)
 
@@ -125,6 +130,36 @@ int main() {
     b1.girlPrint(g1);
 
     return 0;
+}
+#######################################################
+
+
+2) friend 함수
+클래스 내부에 정의가 되어있더라도, 클래스의 멤버 함수가 아닌 전역함수이다.
+단지 자신이 해당 클래스에 private 멤버에 접근할것이다 라는 표현일 뿐이다.
+#######################################################
+#include <iostream>
+using namespace std;
+
+class People{
+private:
+    string name;
+public:
+    People(string name) {this->name = name;} //생성자
+    
+    friend void sayName(People p) {
+    //friend 함수이므로
+    //접근 제어 지시자의 영향을 받지않고 
+    //private 멤버에 직접 접근이 가능
+    cout << p.name << endl;
+}
+};
+
+
+
+void main() {
+    People p("홍길동");
+    sayName(p);
 }
 #######################################################
 

@@ -49,3 +49,134 @@ if(str1==str2)에서 str1과 str2의 문자열이 동일한지를 판단하는 �
 => String 클래스와 동일한 로직을 수행하는 custom 클래스를 정의하여 String 클래스를 구현해보겠다.
 
 
+
+
+
+
+
+
+
+
+#include<iostream>
+#include<string>
+
+using namespace std;
+
+class StringTest {
+private:
+    int len;
+    char* str;
+
+public:
+    StringTest();
+    StringTest(const char* s);
+    ~StringTest();
+    StringTest& operator=(const StringTest& s);
+    StringTest& operator+= (const StringTest& s);
+    bool operator==(const StringTest& s);
+    StringTest operator+ (const StringTest& s);
+    friend ostream& operator << (ostream& os, const StringTest& s);
+    friend istream& operator >> (istream& is, StringTest& s);
+
+};
+
+StringTest::StringTest() {
+    len = 0;
+    str = NULL;
+}
+
+StringTest::StringTest(const char* s) {
+    len = strlen(s);
+    str = new char[len + 1];
+    strcpy_s(str, len + 1, s);
+}
+
+StringTest::~StringTest() {
+    delete[]str;
+}
+
+StringTest& StringTest::operator=(const StringTest& s) {
+    if (str != NULL) {
+        delete[]str;
+    }
+    len = s.len;
+    str = new char[len + 1];
+    strcpy_s(str, len + 1, s.str);
+    return *this;
+}
+
+StringTest& StringTest::operator+= (const StringTest& s) {
+    char* tmpStr = new char[len + 1];
+    strcpy_s(tmpStr, len + 1, str);
+
+    if (str != NULL) {
+        delete[] str;
+    }
+
+    len += s.len;
+    str = new char[len + 1];
+    strcpy_s(str, len + 1, tmpStr);
+    strcat_s(str, len + 1, s.str);
+
+    delete[] tmpStr;
+    return *this;
+}
+
+bool StringTest::operator==(const StringTest& s) {
+
+    if (str == s.str) {
+        return true;
+    }
+    else {
+        return false;
+    }
+
+}
+
+
+
+StringTest StringTest::operator+ (const StringTest& s) {
+    int tmpLen = len + s.len;
+    char* tmpStr = new char[tmpLen + 1];
+
+
+    strcpy_s(tmpStr, len + 1, str);
+    strcat_s(tmpStr, s.len + 1, s.str);
+
+    if(str != NULL){
+        delete[] str;
+    }
+
+    StringTest tmpStringTest(tmpStr);
+
+    delete[] tmpStr;
+    return tmpStringTest;
+
+}
+
+
+
+
+
+ostream& operator<< (ostream& os, const StringTest& s) {
+    os << s.str;
+    return os;
+}
+
+
+
+
+
+int main() {
+    StringTest s1 = "hwang";
+    StringTest s2 = "kim";
+
+    s1 += s2;
+
+   std::cout << s1 + s2;
+
+
+}
+
+
+

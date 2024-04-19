@@ -134,27 +134,18 @@ bool StringTest::operator==(const StringTest& s) {
 }
 
 
-
 StringTest StringTest::operator+ (const StringTest& s) {
     int tmpLen = len + s.len;
     char* tmpStr = new char[tmpLen + 1];
 
-
-    strcpy_s(tmpStr, len + 1, str);
-    strcat_s(tmpStr, s.len + 1, s.str);
-
-    if(str != NULL){
-        delete[] str;
-    }
+    strcpy_s(tmpStr, tmpLen + 1, str);
+    strcat_s(tmpStr, tmpLen + 1, s.str);
 
     StringTest tmpStringTest(tmpStr);
 
     delete[] tmpStr;
     return tmpStringTest;
-
 }
-
-
 
 
 
@@ -163,6 +154,17 @@ ostream& operator<< (ostream& os, const StringTest& s) {
     return os;
 }
 
+istream& operator >> (istream& in, StringTest& s)
+{
+    char tmpStr[100];
+    in >> tmpStr;
+    
+    s.len = strlen(tmpStr);
+    s.str = new char[s.len] + 1;
+
+    strcpy_s(s.str, s.len + 1, tmpStr);
+    return in;
+}
 
 
 
@@ -173,10 +175,13 @@ int main() {
 
     s1 += s2;
 
-   std::cout << s1 + s2;
+    std::cout << s1 + s2;
+
+    StringTest s3;
+    std::cin >> s3;
+    std::cout << s3;
+
 
 
 }
-
-
 

@@ -53,10 +53,7 @@ if(str1==str2)에서 str1과 str2의 문자열이 동일한지를 판단하는 �
 
 
 
-
-
-
-
+########################################################################################################################
 #include<iostream>
 #include<string>
 
@@ -80,10 +77,17 @@ public:
 
 };
 
+
+
+
 StringTest::StringTest() {
     len = 0;
     str = NULL;
 }
+
+
+
+
 
 StringTest::StringTest(const char* s) {
     len = strlen(s);
@@ -91,9 +95,16 @@ StringTest::StringTest(const char* s) {
     strcpy_s(str, len + 1, s);
 }
 
+
+
+
 StringTest::~StringTest() {
     delete[]str;
 }
+
+
+
+
 
 StringTest& StringTest::operator=(const StringTest& s) {
     if (str != NULL) {
@@ -105,6 +116,10 @@ StringTest& StringTest::operator=(const StringTest& s) {
     return *this;
 }
 
+
+
+
+
 StringTest& StringTest::operator+= (const StringTest& s) {
     char* tmpStr = new char[len + 1];
     strcpy_s(tmpStr, len + 1, str);
@@ -115,12 +130,16 @@ StringTest& StringTest::operator+= (const StringTest& s) {
 
     len += s.len;
     str = new char[len + 1];
-    strcpy_s(str, len + 1, tmpStr);
-    strcat_s(str, len + 1, s.str);
+    strcpy_s(str, len, tmpStr);
+    strcat_s(str, len+1, s.str);
 
     delete[] tmpStr;
     return *this;
 }
+
+
+
+
 
 bool StringTest::operator==(const StringTest& s) {
 
@@ -132,6 +151,8 @@ bool StringTest::operator==(const StringTest& s) {
     }
 
 }
+
+
 
 
 StringTest StringTest::operator+ (const StringTest& s) {
@@ -154,17 +175,28 @@ ostream& operator<< (ostream& os, const StringTest& s) {
     return os;
 }
 
+
+
+
 istream& operator >> (istream& in, StringTest& s)
 {
     char tmpStr[100];
     in >> tmpStr;
-    
-    s.len = strlen(tmpStr);
-    s.str = new char[s.len] + 1;
 
+    // 이전 문자열 메모리 해제
+    delete[] s.str;
+
+    // 문자열 길이 계산
+    s.len = strlen(tmpStr);
+
+    // 새로운 문자열 메모리 할당
+    s.str = new char[s.len + 1];
+
+    // 문자열 복사
     strcpy_s(s.str, s.len + 1, tmpStr);
     return in;
 }
+
 
 
 
@@ -177,11 +209,8 @@ int main() {
 
     std::cout << s1 + s2;
 
-    StringTest s3;
-    std::cin >> s3;
-    std::cout << s3;
-
-
-
+   StringTest s3;
+    cin >> s3;
+  // std::cout << s3;
 }
-
+########################################################################################################################

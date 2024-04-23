@@ -1,0 +1,49 @@
+12. 템플릿 1
+
+
+
+
+
+
+
+
+
+1.  함수 템플릿이란
+매개변수와 return 등을 특정 자료형을 적시하지 않은 함수
+-> 호출 시 자료형을 기재해야 한다.
+##########################################
+int add(int num1, int num2){
+return num1 + num2;
+}
+
+->
+
+template <typename T>
+T Add(T num1, T num2){
+return num1 + num2;
+}
+##########################################
+
+
+
+[예제]
+##########################################
+#include<iostream>
+
+template <typename T>
+T Add(T num1, T num2) {
+	return num1 + num2;
+}
+
+void main() {
+	std::cout << Add<int>(20, 30.3);
+	std::cout << Add<float>(20, 30.3);
+	//50
+	//50.3
+}
+##########################################
+
+
+
+
+

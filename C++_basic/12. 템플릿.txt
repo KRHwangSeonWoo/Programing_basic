@@ -206,3 +206,99 @@ int main() {
     return 0;
 }
 ####################################################################################
+
+
+
+
+
+
+
+
+
+5. 클래스 템플릿
+클래스 내에 사용할 변수를 템플릿으로 정의가 가능하다.
+이 또한 우리가 정의한 템플릿을 "클래스 템플릿", 컴파일러가 정의한 템플릿을 "클래스 템플릿"이라고 함
+
+*** 위 함수 템플릿과는 다르게 클래스 템플릿 사용 시 반드시 타입을 정의해줘야 한다.
+####################################################################################
+#include <iostream>
+
+template <typename T>
+class Test {
+private:
+    T member;
+
+public:
+    Test(T member) : member(member) {
+    }
+
+    void showTestData() {
+        std::cout << member;
+    }
+};
+
+int main() {
+    Test<int> a(3);
+    a.showTestData();
+    //3
+    Test<float> b(3.14f);
+    b.showTestData();
+    //3.14
+
+    return 0;
+}
+####################################################################################
+
+
+
+
+
+
+
+
+
+6. 클래스 템플릿의 선언과 정의 분리
+클래스 템플릿의 선언과 정의를 분리 시킬 수 있다.
+
+*정의 시 아래와 같은 패턴을 따른다.
+*************************************************************
+template<typename T>
+Test<T>::Test(T member) : member(member) {
+	std::cout << "Test -> T의 생성자";
+}
+*************************************************************
+1) template<typename T>: 템플릿을 T로 사용할 것이다!
+2) Test<T>: 위 T에 대해 템플릿화된 Test 클래스 템플릿
+
+위 두개를 꼭! 써줘야 한다!
+
+####################################################################################
+#include<iostream>
+
+template<typename T>
+class Test {
+	T member;
+
+public:
+	Test(T member);
+};
+
+/*
+template<typename C>
+Test<C>::Test(C member) : member(member){
+	std::cout << "Test -> T의 생성자";
+} -> 이렇게 해도 상관없음
+어차피 
+*/
+
+template<typename T>
+Test<T>::Test(T member) : member(member) {
+	std::cout << "Test -> T의 생성자";
+}
+int main() {
+
+	Test<int> t1(10);
+
+}
+####################################################################################
+

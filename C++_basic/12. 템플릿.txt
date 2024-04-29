@@ -309,7 +309,6 @@ int main() {
 
 
 
-
 7. 템플릿 파일 분할 시 주의 사항
 
 일반적으로 템플릿이 없는 코드의 파일 분할은 헤더와 소스를 분리하고, main에서는 헤더를 include하면 되지만
@@ -359,6 +358,45 @@ int main() {
 	Point<int> p1(3, 2);
 	Point<double> p2(3.3, 2);
 
+}
+####################################################################################
+
+
+
+
+8. 템플릿 클래스를 통한 배열 클래스 구현
+####################################################################################
+#include<iostream>
+
+template<typename T>
+class ArrayClass {
+private:
+	T* array;
+	int length;
+
+public:
+	ArrayClass(int length) : length(length) {
+		T* = new T[length]
+	}
+
+	T& operator[] (int idx) {
+		if (idx >= length) {
+			std::cout << "배열의 크기를 초과함";
+			exit(1);
+		}
+		else {
+			return T[idx];
+		}
+	}
+
+};
+
+void main() {
+	ArrayClass<int> a1(3);
+	a1[0] = 3;
+
+	ArrayClass<double> a2(3);
+	a2[0] = 32.3;
 }
 ####################################################################################
 

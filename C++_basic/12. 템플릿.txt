@@ -402,3 +402,71 @@ void main() {
 
 
 
+
+
+
+9. 템플릿 안에 템플릿
+
+템플릿 클래스 안에 멤버로 템플릿 클래스를 사용할 경우 아래와 같이 사용할 수 있다.
+ArrayClass<Point<int>> array1(3);
+
+*ArrayClass의 저장 대상이 Point 객체가 아닌 Point 형 포인터일 경우 아래와 같이 표현 가능
+ArrayClass<Point<int>*> array1(3);
+
+*또한 ArrayClass<Point<int>> array1(3); 형태로 선언할 경우, 이는 Point<int>의 객체를 생성하기에 default 생성자를 호출함
+<-> ArrayClass<Point<int>*> array1(3), 즉 포인터 형일 경우 객체가 아닌 포인터이기에 생성자를 호출하지 않음
+####################################################################################
+#include <iostream>
+
+template<typename T>
+class Point {
+public:
+    T x, y;
+
+    Point(T x, T y) : x(x), y(y) {};
+    Point() { std::cout << "Point default 생성자\n"; }
+
+};
+
+template<typename T>
+class ArrayClass {
+public:
+    T* array;
+    int len;
+
+    ArrayClass(int len) : len(len) {
+        array = new T[len];
+    }
+
+    ~ArrayClass() {
+        delete[] array;
+    }
+
+    T& operator[] (int idx) {
+        return array[idx];
+    }
+};
+
+int main() {
+    Point<int> p1(3, 1);
+    std::cout << "1\n";
+    ArrayClass<Point<int>> array1(3);
+    //이 과정에서 Point의 default 생성자를 호출하게 됨
+    std::cout << "2\n";
+
+    array1[0] = p1;
+    std::cout << "3\n";
+
+    return 0;
+}
+-----------------------------------------------------------------
+1
+Point default 생성자
+Point default 생성자
+Point default 생성자
+2
+3
+####################################################################################
+
+
+

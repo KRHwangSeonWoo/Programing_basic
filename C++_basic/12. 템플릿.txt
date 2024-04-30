@@ -470,3 +470,88 @@ Point default 생성자
 
 
 
+
+
+
+
+
+
+
+
+
+10. 특정 클래스의 객체를 인자로 받는 일반함수 정의와 friend 선언
+
+*class에 typename T를 정의해도 클래스 내의 friend 함수는 클래스 멤버 함수가 아니기에 typename을 적용 받지 않음
+그렇기에 friend 위에 typename T를 따로 정의해줘야 함
+
+*엥? 매개변수를 Point p로 받으면 왜 에러가 뜨지?
+-> 매개변수는 객체를 받는 것이다. 이는 매개변수를 받을 때 복사생성자를 이용하여 또하나의 객체가 생성된는 것과 같다. (지역변수 내에 사용할)
+-> 즉,  클래스 템플릿 객체가 생성되는데 이때 클래스 템플릿 객체 선언 시 반드시 타입을 정의해줘야 하기 때문이다. (헷갈리면 위에 참고)
+####################################################################################
+#include<iostream>
+
+template<typename T>
+class Point {
+private:
+	T x, y;
+public:
+	Point(T x, T y) : x(x), y(y) {
+
+	}
+
+
+	template<typename T>
+	friend void showPoint(Point<T> p);
+
+};
+
+template<typename T>
+void showPoint(Point<T> p) {
+	std::cout << p.x << p.y << "\n";
+}
+
+int main() {
+	Point<int> p1(1, 23);
+	showPoint(p1);
+	
+	Point<double> p2(1, 23.23);
+	showPoint(p2);
+	//123
+	//123.23
+	
+}
+####################################################################################
+
+
+함수에 직접 템플릿 자료형을 정의하면 typename을 정의하지 않아도됨 -> 대신 사용할 자료형마다 명시적으로 정의해야 함
+####################################################################################
+#include<iostream>
+
+template<typename T>
+class Point {
+private:
+	T x, y;
+public:
+	Point(T x, T y) : x(x), y(y) {
+
+	}
+
+	friend void showPoint(Point<int> p);
+
+};
+
+void showPoint(Point<int> p) {
+	std::cout << p.x << p.y << "\n";
+}
+
+int main() {
+	Point<int> p1(1, 23);
+	showPoint(p1);
+	
+	Point<double> p2(1, 23.23);
+	//showPoint(p2); -> 에러: showPoint<double> 함수가 정의되지 않았기 때문에
+	//123
+	//123.23
+	
+}
+####################################################################################

@@ -627,6 +627,9 @@ int main() {
 
 12. 클래스 템플릿의 부분 특수화
 
+*우선 순위
+"전체 특수화 (<int, double>)" > "부분 특수화(<T1, double>)" > 기본 템플릿
+
 template<typename T1, typename T2>
 ->
 template<>

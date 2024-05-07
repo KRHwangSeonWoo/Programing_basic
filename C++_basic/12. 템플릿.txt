@@ -619,3 +619,65 @@ int main() {
     return 0;
 }
 ####################################################################################
+
+
+
+
+
+
+12. 클래스 템플릿의 부분 특수화
+
+template<typename T1, typename T2>
+->
+template<>
+class Test<char, int> 식으로 특수화할 수 있다. 
+->
+template<>
+class Test<T1, int>로도 특수화 할 수 있다.
+####################################################################################
+#include<iostream>
+
+template<typename T1, typename T2>
+class Test {
+
+public:
+	void whoami() {
+		std::cout << "<typename T1, typename T2>";
+
+	}
+};
+
+template<>
+class Test <int, double> {
+public:
+	void whoami() {
+		std::cout << "<int, double>";
+
+	}
+	
+};
+
+template<typename T1>
+class Test <T1, double> {
+public:
+	void whoami() {
+		std::cout << "<T1, double>";
+
+	}
+
+};
+
+int main() {
+	Test<int, int> test1;
+	test1.whoami();
+
+	Test<int, double> test2;
+	test2.whoami();
+
+	Test<float, double> test3;
+	test3.whoami();
+
+	//<typename T1, typename T2><int, double><T1, double>
+}
+####################################################################################
+

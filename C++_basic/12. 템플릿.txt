@@ -684,3 +684,42 @@ int main() {
 }
 ####################################################################################
 
+
+
+
+13. 템플릿 매개변수에는 변수의 선언이 올 수 있다.
+*template<typename T, int num>이런 식으로 (template<typename T, int num = 7> 이런 식으로 default 값을 지정할 수도 있다)
+####################################################################################
+#include<iostream>
+template<typename T, int num>
+class Test {
+	public:
+		T var = num;
+};
+
+int main() {
+	Test<int,5> test;
+	std::cout << test.var;
+	//5
+}
+####################################################################################
+
+
+####################################################################################
+#include<iostream>
+template<typename T, int num = 7>
+class Test {
+	public:
+		T var = num;
+};
+
+int main() {
+	Test<int> test;
+	std::cout << test.var;
+	//7
+	Test<int, 1> test1;
+	std::cout << test1.var;
+	//1
+
+}
+####################################################################################

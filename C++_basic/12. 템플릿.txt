@@ -723,3 +723,58 @@ int main() {
 
 }
 ####################################################################################
+
+
+
+
+
+
+
+14. static 멤버 변수 템플릿
+기본적으로 같은 클래스의 객체의 static 멤버 변수는 메모리를 공유한다.
+즉. 같은 클래스로 생성된 obj1, obj2의 static 변수는 같은 메모리가 공유된다.
+하지만 템플릿 클래스인 경우, 템플릿 자료형이 다를 때 (예를 들어 <int>, 혹은 <double>)일 경우 각각의 템플릿 클래스가 컴파일러에 의해 생성되기에
+별개의 클래스로 치부되어 템플릿 클래스 자료형마다 다른 static 변수 메모리를 가지게 된다.
+
+####################################################################################
+#include<iostream>
+
+template<typename T>
+class StaticTest {
+	private:
+		static T var;
+
+	public:
+		void addNum(int num) {
+			var = var + num;
+		}
+
+		T returnNum() {
+			return var;
+		}
+};
+
+template<typename T>
+T StaticTest<T>::var = 10;
+
+
+int main() {
+	
+	StaticTest<int> t1;
+	StaticTest<int> t2;
+
+	t1.addNum(10);
+
+	std::cout << t2.returnNum();
+	//20
+
+
+	StaticTest<double> t3;
+	StaticTest<double> t4;
+
+	t3.addNum(10);
+
+	std::cout << t4.returnNum();
+	//20
+}
+####################################################################################

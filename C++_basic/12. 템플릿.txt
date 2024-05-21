@@ -789,6 +789,16 @@ int main() {
 
 
 *템플릿 클래스의 static 멤버 특수화
+**************************************
+template<>
+class Test<int> {
+public:
+	static int num;
+};
+
+int Test<int>::num = 20;
+**************************************
+
 ####################################################################################
 #include<iostream>
 
@@ -801,15 +811,8 @@ public:
 
 template<typename T>
 T Test<T>::num = 10;
-
-
-template<>
-class Test<int> {
-public:
-	static int num;
-};
-
 int Test<int>::num = 20;
+
 
 int main() {
 	Test<int> t1;

@@ -1,2 +1,201 @@
 [1. 소켓 시작하기]
+********************************************************************
+#include <sys/types.h> // basic type definitions
+#include <sys/socket.h> // socket(), AF_INET, ...
+#include <arpa/inet.h> // htons(), htonl(), ...
+#include <netdb.h> // gethostbyname(), ...
+#include <unistd.h> // close(), ...
+#include <fcntl.h> // fcntl(), ...
+#include <pthread.h> // pthread_create(), ...
+#include <poll.h> // poll()
+#include <sys/epoll.h> // epoll()
+
+#include <stdio.h> // printf(), ...
+#include <stdlib.h> // exit(), ...
+#include <string.h> // strerror(), ...
+#include <errno.h> // errno
+//errno.h를 include하면서 전역 변수 errno가 선언됨. 오류가 발생될 때 오류를 정수형으로 나타내는
+//값이 errno에 들어가게 됨. 
+********************************************************************
+
+
+
+1. 오류 처리
+소켓 함수 호출 시 오류가 발생할 수 있다.
+이때 오류를 어떻게 처리하는지 알아보겠다.
+
+소켓함수의 오류는 아래와 같이 있거나 없을 수가 있다.
+
+1) 오류를 처리할 필요가 없는 경우: 소켓 함수가 리턴 값이 없거나 항상 성공하는 일부 소켓 함수
+2) 오류 발생을 확인하고 구체적인 내용은 오류 코드로 확인하는 경우: 대부분의 소켓 함수
+
+1)의 경우 오류처리할 필요가 없기에 2)의 오류 처리 방법을 살펴보자
+
+[파일 열기 실패 -> err_display()호출 -> 오류로 인해 errno이 저장된 상태 -> strerror를 사용하여 해당 오류 번호를 알기 쉽게 print]
+#############################################################
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<errno.h>
+//errno.h를 include하면서 전역 변수 errno가 선언됨. 오류가 발생될 때 오류를 정수형으로 나타내는
+//값이 errno에 들어가게 됨. 
+
+
+
+void err_quit(const char* msg) {
+	char* msgbuf = strerror(errno);
+	printf("[%s] %s\n", msg, msgbuf);
+	exit(1);
+}
+
+void err_display(const char* msg) {
+	char* msgbuf = strerror(errno);
+	printf("[%s] %s \n", msg, msgbuf);
+}
+
+FILE*  file_open_fail() {
+	FILE* file = fopen("non_existent_file.txt", "r");
+	return file;
+}
+
+int main() {
+	if (file_open_fail() == NULL) {
+		err_display("file_open_fail()");
+		//[file_open_fail()] No such file or directory
+	}	
+}
+#############################################################
+
+
+
+
+
+
+
+
+
+
+2. 소켓 생성과 닫기
+
+
+(1) 소켓 생성 함수, socket
+소켓 생성시 해당 소켓을 나타내는 정수형 숫자를 소켓 디스크립터라고 부른다.
+
+int socket(
+int domain //주소 체계
+int type //소켓 타입 지정
+int protocol //사용할 프로토콜 지정
+);
+
+#인자값 분석
+1) int domain: 주소 체계
+IPV4 = AF_INET
+IPV6 = AF_INET6
+
+2) 소켓 타입
+소켓의 타입을 가르킨다. 즉 연결형 프로토콜을 사용할 것인가 아님, 비연결형 프로토콜을 사용할 것인가를 결정한다.
+연결형 프로토콜 (TCP, SCTP 등등..) = SOCK_STREAM 
+비연결형 프로토콜 (UDP, DCCP 등등...) = SOCK_DGRAM
+
+3) 프로토콜
+프로토콜을 가르킨다, 즉 TCP, UDP 등과 같은 프로토콜 자체를 가르킨다.
+UDP와 TCP 같은 경우는 소켓 타입으로만 넣어도 된다고 한다. 그래서 대개는 0을 넣는다고 한다.
+TCP = IPPROTO_TCP
+(TCP는 연결지향적으로 UDP와 다르게 3 way, 데이트를 수신 받으면 ack를 주는 등으로 안전하게 데이터를 송수신할 수 있으며 ack을 못 받은 경우 재전송할 수 있게 된다.)
+UDP = IPPROTO_UDP
+
+
+(2) 소켓 닫기, close()
+
+int close(
+int fd
+);
+
+#인자값 분석
+1) fd: 소켓 생성 시 할당된 소켓 디스크립터
+
+
+
+[소켓 생성 및 닫기]
+############################################################################################################
+#include...
+
+#define FAILE -1
+
+void err_quit(const char* msg) {
+	char* msgbuf = strerror(errno);
+	printf("[%s] %s\n", msg, msgbuf);
+	exit(1);
+}
+
+void err_display(const char* msg) {
+	char* msgbuf = strerror(errno);
+	printf("[%s] %s \n", msg, msgbuf);
+}
+
+int main() {
+
+	//소켓 생성
+	int socket1 = socket(AF_INET, SOCK_STREAM, 0);
+	
+	//소켓 생성 실패 시 error print
+	if (socket1 == FAILE) {
+		err_display("socket()");
+	}
+	
+	//소켓 close
+	close(socket1);
+
+}
+############################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3. 소켓 주소 구조체 다루기
+소켓 구조체는 네트워크 프로그램에 필요한 주소 정보를 담는 구조체이다.
+구조체 내용은 아래와 같다.
+
+***여기서 
+unsigned short host_port = 12345; // 10진수로 할당
+unsigned short host_port = 0b11000000111001; // 2진수로 할당
+unsigned short host_port = 0x3039; // 16진수로 할당
+
+
+
+
+(1) sockaddr 구조체
+sock 구조체의 대표 타입이다.
+TCP/IP 프로토콜을 위한 구조체는 아래 sockaddr_in(6)를 쓴다. 
+
+struct sockaddr {
+unsigned short sa_family; //주소 체계 (AF_INET or AF_INET6)
+char sa_data[14]; //IP 주소와 port 정보를 담음
+};
+
+*리눅스에서는 sockaddr이 typedef로 SOCKDDR로도 정의되어 있다
+
+
+(2) ***sockaddr_in
+IPv4에서 사용되는 구조체 타입이다.  
+
+struct sockaddr_in{
+short sin_family; //주소 체계 (AF_INET or AF_INET6)
+unsined short sin_port; //포트 정보
+struct in_addr; //IP
+}
 

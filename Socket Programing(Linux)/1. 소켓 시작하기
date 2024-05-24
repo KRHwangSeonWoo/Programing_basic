@@ -182,7 +182,6 @@ unsigned short host_port = 0x3039; // 16진수로 할당
 
 (1) sockaddr 구조체
 sock 구조체의 대표 타입이다.
-TCP/IP 프로토콜을 위한 구조체는 아래 sockaddr_in(6)를 쓴다. 
 
 struct sockaddr {
 unsigned short sa_family; //주소 체계 (AF_INET or AF_INET6)
@@ -192,12 +191,129 @@ char sa_data[14]; //IP 주소와 port 정보를 담음
 *리눅스에서는 sockaddr이 typedef로 SOCKDDR로도 정의되어 있다
 
 
-(2) ***sockaddr_in
-IPv4에서 사용되는 구조체 타입이다.  
+***TCP/IP 프로토콜을 위한 구조체는 아래 sockaddr_in(6)를 쓴다. 
+
+(2) sockaddr_in
+IPv4에서 사용되는 구조체 타입이다.
 
 struct sockaddr_in{
-short sin_family; //주소 체계 (AF_INET or AF_INET6)
-unsined short sin_port; //포트 정보
-struct in_addr; //IP
+short sin_family; //주소 체계 (AF_INET) (리틀엔디안)
+unsined short sin_port; //포트 정보 (빅엔디안)
+struct in_addr; //IP (빅엔디안)
 }
 
+
+(3) sockaddr_in6
+IPv4에서 사용되는 구조체 타입이다.
+
+struct sockaddr_in6{
+short sin6_family; //주소 체계 (AF_INET6) (리틀엔디안)
+u_short sin_port; //포트 정보 (빅엔디안)
+struct in6_addr; //IP (빅엔디안)
+}
+
+=> struct in6_addr 구조
+
+struct in_addr{
+   uint32_t s_addr;
+}
+
+struct in_addr{
+   unsigned char s6_addr[16] s_addr;
+}
+
+
+
+
+
+(2) 바이트 정렬 함수, hton()과 ntoh
+바이트 정렬은 메모리에 데이터를 저장할 때 바이트의 배치 순서를 나타낸다.
+바이트 정렬의 종류는 "빅엔디안"과 "리틀 엔디안" 방식이 있다.
+
+소켓 함수에 데이터를 넣을 때 빅엔디안 방식으로 정렬된 데이터를 받고, 일반적인 시스템이나 응용 프로그램은 리틀 엔디안 방식으로 데이터를 받는다.
+즉, 이 둘간에 데이터 정렬하는 방식이 다르기에 우리는 이것을 각각 상황에 따라서 데이터 정렬을 해줘야 한다.
+
+데이터 정렬 변환은 아래 함수를 통해 변경이 가능하다.
+
+1. hton (네트워크 바이트 정렬)
+2. ntoh (호스트 바이트 정렬)
+
+또한 아래를 통해 이해해보자
+
+*응용 프로그램 -> 소켓 함수
+응용 프로그램 데이터(소켓 함수에 전달할 데이터) -> hton(데이터) -> 소켓 함수()로 전달
+
+*소켓 함수 -> 응용 프로그램
+소켓 함수가 결과로 리턴한 데이터 -> ntoh(데이터) -> 응용프로그램이 사용
+
+
+[빅 엔디안과 리틀 엔디안 방식]
+
+int, 즉 4바이트의 정수를 메모리에 저장한다고 가정
+1바이트당 16진수로 0xFF(256 in 10진수)로  표현이 가능하다.
+
+[0x12563478을 빅엔디안과 리틀 엔디안 방식으로 저장해보자]
+0xFF는 1바이트에서 최대한 많이 저장할 수 있는 수로, 1바이트씩 저장하기에 16진수로 표현하면 0xXX식으로 2자리씩 끊어서 메모리에 저장한다.
+
+1) 빅 엔디안 = 네트워크 바이트 정렬 (네트워크 바이트 정렬 방식(소켓 함수가 사용하는 데이터 정렬 방식))
+0x12563478
+주소:  0x00  0x01  0x02  0x03
+값:    0x12  0x56  0x34  0x78
+
+2) 리틀 엔디안 = 호스트 바이트 정렬 (응용 프로그램 or OS가 사용하는 바이트 정렬 방식)
+0x12563478
+주소:   0x00  0x01  0x02  0x03
+값:    0x78  0x34  0x56  0x12
+
+
+***sockaddr_in 구조체에서의 바이트 정렬***
+
+sockaddr_in(6){
+sin(6)_family //호스트 바이트 정렬
+sin(6)_addr //네트워크 바이트 정렬
+sin(6)_port //네트워크 바이트 정렬
+}
+
+
+
+
+
+
+
+
+
+
+(3) IP 주소 변환 함수, inet_ntop
+응용프로그램에서 IP 주소를 문자열 형태로 받고, sockaddr_in 구조체에서는 정수형으로 IP를 받기에 정수형으로 변경해줘야 함
+이때 우리는 inet_ntop() 함수를 사용하면 된다.
+
+IP 주소(문자열) -> 정수형: int inet_pton(int af, const char *src, void *dst); 
+정수형 -> IP 주소(문자열): const char *inet_ntop(int af, const void *src, char *dst, socklen_t size); 
+
+############################################################################################################
+#include ...
+
+int main() {
+
+	struct sockaddr_in addr;
+	addr.sin_family = AF_INET;
+	
+	inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr); 
+	//127.0.0.1을 정수형으로 바뀐 값이 자동으로 hton 함수를 통해 네트워크 데이터 정렬된 값으로 addr.sin_addr에 들어가게 된다.
+	
+	addr.sin_port = htons(9000);
+	printf("%d\n", addr.sin_port);
+	//10275 -> 9000이 아님, 당연한 결과 빅엔디안으로 정렬된 데이터를 리틀 엔디안으로 해석했기때문
+	printf("%d", ntohs(addr.sin_port));
+	//9000 출력
+
+	char ipaddr[INET_ADDRSTRLEN];
+
+	inet_ntop(AF_INET, &addr.sin_addr, ipaddr, sizeof(ipaddr));
+
+	printf("%s", &ipaddr);
+	//127.0.0.1
+
+
+}
+############################################################################################################

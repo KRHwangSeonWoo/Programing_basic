@@ -317,3 +317,93 @@ int main() {
 
 }
 ############################################################################################################
+
+
+
+
+
+
+
+
+
+(4) DNS와 이름 변환 함수, gethostbyname, gethostbyaddr
+
+1. 도메인 이름 -> IP 주소 (네트워크 바이트 정렬)
+struct hosten * gethostbyname(
+const char *name
+)
+
+2. IP 주소(네트워크 바이트 정렬) -> 도메인 이름
+struct hostent * gethostbyaddr(
+const void *addr, //IP 주소, 네트워크 바이트 정렬
+int len, //IP 주소 길이
+int type //주소 체계
+)
+
+####################################################################################
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+bool getIPAddress(const char* domain, struct in_addr *addr) {
+	struct hostent* hostent = gethostbyname(domain);
+	if (hostent == NULL) {
+		printf("hosttent is NULL");
+		return false;
+	}
+	else {
+
+		if (hostent->h_addrtype != AF_INET) {
+			printf("hosttent is not IPv4");
+			return false;
+		}
+		else {
+			memcpy(addr, hostent->h_addr, hostent->h_length);
+			return true;
+		}
+	}
+}
+
+bool getDomainAdress(struct in_addr addr, char* name, int len) {
+	struct hostent* hostent = gethostbyaddr(&addr, sizeof(addr), AF_INET);
+
+	if (hostent == NULL) {
+		printf("getDomainAdress's return is NULL");
+		return false;
+	}
+	else {
+		if (hostent->h_addrtype != AF_INET) {
+			printf("return is not IPv4");
+		}
+		strncpy(name, hostent->h_name, len);
+		return true;
+	}
+
+
+
+}
+
+
+int main() {
+	/*IP 구하기*/
+	struct in_addr in_addr;	
+	getIPAddress("www.naver.com", &in_addr);
+	char IP[100];
+	inet_ntop(AF_INET, &in_addr, IP, sizeof(IP));
+	printf("%s", IP);
+
+
+	/*도메인 구하기*/
+	struct in_addr in_addr2;
+	inet_pton(AF_INET, "8.8.8.8", &in_addr2.s_addr);
+	char domain[256];
+	getDomainAdress(in_addr2, domain, 256);
+	printf("%s", domain);
+
+
+}
+####################################################################################

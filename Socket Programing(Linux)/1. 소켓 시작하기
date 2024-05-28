@@ -41,7 +41,7 @@ void err_display(int errcode)
 	char* msgbuf = strerror(errcode);
 	printf("[오류] %s\n", msgbuf);
 }
-2장 이후부터 쭉~ 있는 코드
+2장 이후부터 쭉~ 사용할 코드
 ********************************************************************
 
 

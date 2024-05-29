@@ -96,30 +96,31 @@ void err_display(int errcode)
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int main(){
 	//소켓 생성
-	int sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock == INVALID_SOCKET) {
-		err_display("sock");
-	}
+int sock = socket(AF_INET, SOCK_STREAM, 0);
+if (sock == INVALID_SOCKET) {
+	err_display("sock");
+}
 
-	//bind()
-	struct sockaddr_in serverAddr;
-	memset(&serverAddr, 0, sizeof(serverAddr));
-	//serverAddr의 모든 멤버를 0으로 초기화
-	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(SERVERPORT);
-	serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	//INADDR_ANY는 0.0.0.0으로 모든 IP를 의미한다.
+//bind()
+struct sockaddr_in serverAddr;
+memset(&serverAddr, 0, sizeof(serverAddr));
+//serverAddr의 모든 멤버를 0으로 초기화
+serverAddr.sin_family = AF_INET;
+serverAddr.sin_port = htons(SERVERPORT);
+serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+//INADDR_ANY는 0.0.0.0으로 모든 IP를 의미한다.
 
-	int retval = bind(sock, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
-	//엥? 왜 2번째 인수 serverAdrr을 sockaddr로 형 변환하지?
-	//bind 함수에서는 const struct sockaddr *로 인자를 받기 때문에 형 변환해줘야 한다.
-	//엥? 근데 sockaddr과 sockaddr_in의 멤버가 다르잖아? 어떻게 해석할건데?
-	//형 변환을 할때 sockaddr과 sockaddr_in의 첫번째 멤버는 각각 sa_family와 sin_family이다.
-	//struct sockaddr_in은 struct sockaddr의 첫 멤버들이 동일하게 배열되어 있어서 호환이 가능하다.
-	//sockaddr_in의 첫 멤버인 sin_family는 sockaddr의 sa_family와 동일한 위치에 있고, 
-	// 따라서 캐스팅을 통해 두 구조체는 같은 메모리 레이아웃을 공유하게 된다.
-	//그렇기에 아래와 같이 IP 주소 체계에 따라 다르게 로직을 수행한다.
+int retval = bind(sock, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
+//엥? 왜 2번째 인수 serverAdrr을 sockaddr로 형 변환하지?
+//bind 함수에서는 const struct sockaddr *로 인자를 받기 때문에 형 변환해줘야 한다.
+//엥? 근데 sockaddr과 sockaddr_in의 멤버가 다르잖아? 어떻게 해석할건데?
+//형 변환을 할때 sockaddr과 sockaddr_in의 첫번째 멤버는 각각 sa_family와 sin_family이다.
+//struct sockaddr_in은 struct sockaddr의 첫 멤버들이 동일하게 배열되어 있어서 호환이 가능하다.
+//sockaddr_in의 첫 멤버인 sin_family는 sockaddr의 sa_family와 동일한 위치에 있고, 
+// 따라서 캐스팅을 통해 두 구조체는 같은 메모리 레이아웃을 공유하게 된다.
+//그렇기에 아래와 같이 IP 주소 체계에 따라 다르게 로직을 수행한다.
 /*
 	int bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen) {
 		// 내부적으로는 addr->sa_family 값을 보고 어떤 주소 체계인지 확인
@@ -137,60 +138,61 @@ void err_display(int errcode)
 		// 다른 주소 체계 처리 ...
 	}
 */
-	//SOMAXCONN은 백로그 큐의 길이이다. 최대는 SOMACCONN으로 4096이다.
-	retval = listen(sock, SOMAXCONN);
-	if (retval == SOCKET_ERROR) {
-		err_quit("bind()");
+//SOMAXCONN은 백로그 큐의 길이이다. 최대는 SOMACCONN으로 4096이다.
+retval = listen(sock, SOMAXCONN);
+if (retval == SOCKET_ERROR) {
+	err_quit("bind()");
+}
+
+
+//데이터 통신에 사용할 변수
+int clientSock;
+struct sockaddr_in clientAddr;
+socklen_t addrlen;
+char buf[BUFSIZE];
+
+while (1) {
+	addrlen = sizeof(clientAddr);
+	clientSock = accept(sock, (struct sockaddr*)&clientAddr, &addrlen);
+
+	if (clientSock == INVALID_SOCKET) {
+		err_display("accept()");
+		break;
 	}
 
+	//접속한 클라이언트 정보 출력
+	char addr[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &clientAddr.sin_addr, addr, sizeof(addr));
+	printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n", addr, ntohs(clientAddr.sin_port));
 
-	//데이터 통신에 사용할 변수
-	int clientSock;
-	struct sockaddr_in clientAddr;
-	socklen_t addrlen;
-	char buf[BUFSIZE];
-
+	//클라이언트와 데이터 통신
 	while (1) {
-		addrlen = sizeof(clientAddr);
-		clientSock = accept(sock, (struct sockaddr*)&clientAddr, &addrlen);
+		//데이터 받기
+		retval = recv(clientSock, buf, BUFSIZE - 1, 0);
+		printf("%d", retval);
+		if (retval == SOCKET_ERROR) {
+			err_display("recv()");
+			break;
+		}
+		else if (retval == 0) break;
 
-		if (clientSock == INVALID_SOCKET) {
-			err_display("accept()");
+		buf[retval] = '\0';
+		printf("%s", buf);
+
+		//데이터 보내기
+		retval = send(clientSock, buf, retval, 0);
+		if (retval == SOCKET_ERROR) {
+			err_display("send()");
 			break;
 		}
 
-		//접속한 클라이언트 정보 출력
-		char addr[INET_ADDRSTRLEN];
-		inet_ntop(AF_INET, &clientAddr.sin_addr, addr, sizeof(addr));
-		printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n", addr, ntohs(clientAddr.sin_port));
-
-		//클라이언트와 데이터 통신
-		while (1) {
-			//데이터 받기
-			retval = recv(clientSock, buf, BUFSIZE - 1, 0);
-				printf("%d", retval);
-			if (retval == SOCKET_ERROR) {
-				err_display("recv()");
-				break;
-			}
-		else if (retval == 0) break;
-		
-			buf[retval] = '\0';
-			printf("%s", buf);		
-		
-			//데이터 보내기
-			retval = send(clientSock, buf, retval, 0);
-			if (retval == SOCKET_ERROR) {
-				err_display("send()");
-				break;
-			}
-		
-		}
-
-		close(clientSock);
-
 	}
 
-	close(sock);
+	close(clientSock);
+
 }
+
+close(sock);
+}
+
 ##############################################################################################################

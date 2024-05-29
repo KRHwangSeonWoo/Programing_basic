@@ -34,7 +34,141 @@ TCP 서버는 세션을 맺는 소켓따로 세션을 맺고 나서 클라이언
 서버(에코 서버): 클라이언트가 보낸 데이터를 받아서 (recv) 이를 문자열로 간주하여 화면에 출력한다 (print).
 그런 다음 받은 데이터를 변경 없이 다시 클라이언트에 보낸다. (send)
 
-클라이언트(에코 클라이언트): 사용자가 입력한 문자열을 서버에 보낸다 (send). 서버가 데이터를 그대로 돌려 보내면 이를 그대로 받아서 (recv)
+클라이언트(에코 클라이언트): 사용자가 입력한 문자열을 서버에 보낸다 (send). 서버가 데이터를 그대로 돌려 보내면 이를 그대로 받아서 (recv) 화면에 출력한다. (printf)
 
 
-화면에 출력한다. (printf)
+
+
+
+
+
+
+##############################################################################################################
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//공통 코드
+#include <sys/types.h> // basic type definitions
+#include <sys/socket.h> // socket(), AF_INET, ...
+#include <arpa/inet.h> // htons(), htonl(), ...
+#include <netdb.h> // gethostbyname(), ...
+#include <unistd.h> // close(), ...
+#include <fcntl.h> // fcntl(), ...
+#include <pthread.h> // pthread_create(), ...
+#include <poll.h> // poll()
+#include <sys/epoll.h> // epoll()
+
+#include <stdio.h> // printf(), ...
+#include <stdlib.h> // exit(), ...
+#include <string.h> // strerror(), ...
+#include <errno.h> // errno
+
+// Windows 소켓 코드와 호환성을 위한 정의
+typedef int SOCKET;
+#define SOCKET_ERROR   -1
+#define INVALID_SOCKET -1
+
+// 소켓 함수 오류 출력 후 종료
+void err_quit(const char* msg)
+{
+	char* msgbuf = strerror(errno);
+	printf("[%s] %s\n", msg, msgbuf);
+	exit(1);
+}
+
+// 소켓 함수 오류 출력
+void err_display(const char* msg)
+{
+	char* msgbuf = strerror(errno);
+	printf("[%s] %s\n", msg, msgbuf);
+}
+
+// 소켓 함수 오류 출력
+void err_display(int errcode)
+{
+	char* msgbuf = strerror(errcode);
+	printf("[오류] %s\n", msgbuf);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define SERVERPORT 9000
+#define BUFSIZE 512
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int main() {
+
+	//소켓 생성
+	int sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (sock == INVALID_SOCKET) {
+		err_display("sock");
+	}
+
+	//bind()
+	struct sockaddr_in serverAddr;
+	memset(&serverAddr, 0, sizeof(serverAddr));
+	//serverAddr의 모든 멤버를 0으로 초기화
+	serverAddr.sin_family = AF_INET;
+	serverAddr.sin_port = htons(SERVERPORT);
+	serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	//INADDR_ANY는 0.0.0.0으로 모든 IP를 의미한다.
+
+	int retval = bind(sock, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
+	//엥? 왜 2번째 인수 serverAdrr을 sockaddr로 형 변환하지?
+	//bind 함수에서는 const struct sockaddr *로 인자를 받기 때문에 형 변환해줘야 한다.
+	//엥? 근데 sockaddr과 sockaddr_in의 멤버가 다르잖아? 어떻게 해석할건데?
+	//형 변환을 할때 sockaddr과 sockaddr_in의 첫번째 멤버는 각각 sa_family와 sin_family이다.
+	//struct sockaddr_in은 struct sockaddr의 첫 멤버들이 동일하게 배열되어 있어서 호환이 가능하다.
+	//sockaddr_in의 첫 멤버인 sin_family는 sockaddr의 sa_family와 동일한 위치에 있고, 
+	// 따라서 캐스팅을 통해 두 구조체는 같은 메모리 레이아웃을 공유하게 된다.
+	//그렇기에 아래와 같이 IP 주소 체계에 따라 다르게 로직을 수행한다.
+/*
+	int bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen) {
+		// 내부적으로는 addr->sa_family 값을 보고 어떤 주소 체계인지 확인
+		// addr->sa_family가 AF_INET이면, addr을 struct sockaddr_in으로 간주하고 처리
+		if (addr->sa_family == AF_INET) {
+			// IPv4 주소 체계 처리
+			const struct sockaddr_in* addr_in = (const struct sockaddr_in*)addr;
+			// addr_in을 사용하여 소켓을 바인딩
+		}
+		else if (addr->sa_family == AF_INET6) {
+			// IPv6 주소 체계 처리
+			const struct sockaddr_in6* addr_in6 = (const struct sockaddr_in6*)addr;
+			// addr_in6을 사용하여 소켓을 바인딩
+		}
+		// 다른 주소 체계 처리 ...
+	}
+*/
+	if (retval == SOCKET_ERROR) {
+		err_quit("bind()");
+	}
+
+
+	//데이터 통신에 사용할 변수
+	int clientSock;
+	struct sockaddr_in clientAddr;
+	socklen_t addrlen;
+	char buf[BUFSIZE + 1];
+
+	while (1) {
+		addrlen = sizeof(clientAddr);
+		clientSock = accept(sock, (struct sockaddr*)&clientAddr, &addrlen);
+
+		if (clientSock == INVALID_SOCKET) {
+			err_display("accept()");
+			break;
+		}
+
+		char addr[INET_ADDRSTRLEN];
+		inet_ntop(AF_INET, &clientAddr.sin_addr, addr, sizeof(addr));
+		printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n", addr, ntohs(clientAddr.sin_port));
+
+
+
+
+	}
+
+
+
+}
+##############################################################################################################

@@ -96,8 +96,6 @@ void err_display(int errcode)
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int main() {
-
 	//소켓 생성
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock == INVALID_SOCKET) {
@@ -139,6 +137,8 @@ int main() {
 		// 다른 주소 체계 처리 ...
 	}
 */
+	//SOMAXCONN은 백로그 큐의 길이이다. 최대는 SOMACCONN으로 4096이다.
+	retval = listen(sock, SOMAXCONN);
 	if (retval == SOCKET_ERROR) {
 		err_quit("bind()");
 	}
@@ -148,7 +148,7 @@ int main() {
 	int clientSock;
 	struct sockaddr_in clientAddr;
 	socklen_t addrlen;
-	char buf[BUFSIZE + 1];
+	char buf[BUFSIZE];
 
 	while (1) {
 		addrlen = sizeof(clientAddr);
@@ -159,16 +159,38 @@ int main() {
 			break;
 		}
 
+		//접속한 클라이언트 정보 출력
 		char addr[INET_ADDRSTRLEN];
 		inet_ntop(AF_INET, &clientAddr.sin_addr, addr, sizeof(addr));
 		printf("\n[TCP 서버] 클라이언트 접속: IP 주소=%s, 포트 번호=%d\n", addr, ntohs(clientAddr.sin_port));
 
+		//클라이언트와 데이터 통신
+		while (1) {
+			//데이터 받기
+			retval = recv(clientSock, buf, BUFSIZE - 1, 0);
+				printf("%d", retval);
+			if (retval == SOCKET_ERROR) {
+				err_display("recv()");
+				break;
+			}
+		else if (retval == 0) break;
+		
+			buf[retval] = '\0';
+			printf("%s", buf);		
+		
+			//데이터 보내기
+			retval = send(clientSock, buf, retval, 0);
+			if (retval == SOCKET_ERROR) {
+				err_display("send()");
+				break;
+			}
+		
+		}
 
-
+		close(clientSock);
 
 	}
 
-
-
+	close(sock);
 }
 ##############################################################################################################

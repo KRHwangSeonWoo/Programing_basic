@@ -286,15 +286,19 @@ int main() {
 		printf("%d\n", strlen(buf));
 		
 		//버퍼의 크기가 512 미만인경우, \n 문자가 추가되어 해당 문자를 NULL로 교체, 
-		// 512 이상인 경우 \n 문자가 삽입되지 않아 NULL 값 넣음
-		if (sizeof(buf) == BUFSIZE) {
+		// 512 이상인 경우 \n 문자가 삽입되지 않아 NULL 값 넣음 (예를 들어 513바이트를 입력하고 엔터를 쳤다고 가정한다. 그럼 \n(엔터)까지 514바이트를 필요로한다.
+		//하지만 fgets로 513까지만 저장하기에 마지막 \n은 포함되지 않아 삭제하지 않아도된다. 그렇기에 513바이트째에 \0을 추가해주자 (이미 \0이 추가되었겠지만 안정성을 위해 다시 추가)
+		if (strlen(buf) == BUFSIZE) {
 			buf[len] = '\0';
 		}
 		else {
 			buf[len - 1] = '\0';
 		}
+		printf("테스트%d\n", strlen(buf));
+		retval = send(sock, buf, strlen(buf), 0);
+	
 		
-		retval = send(sock, buf, strlen(buf) + 1, 0);
+		
 		if (retval == SOCKET_ERROR) {
 			err_display("send");
 			break;

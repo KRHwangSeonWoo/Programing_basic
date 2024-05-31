@@ -422,8 +422,37 @@ retval = bind(sock, (struct sockaddr*)&serverAddr, sizeof(serverAddr));//
 3. listen(), TCP 상태를 listen으로 바꾸는 함수
 
 int listen(
-int sock,
-int backlog
+int sock, //클라이언트 접속을 수용하는 소켓으로 이전 bind 함수를 호출하여 지역 IP 주소와 지역 포트를 설정한 상태이다.
+int backlog //클라이언트 접속 정보는 연결 큐에 저장되는데, 이를 backlog 큐라고 한다. 이 백로그 큐의 길이를 나타낸다. 최대값으로 설정하려면 SOMAXCONN으로 사용하면 된다.
 )
 
+//listen
+retval = listen(sock, SOMAXCONN);
+
+
+
+
+
+
+
+4. accept(), 클라이언트와 통신할 수 있는 새로운 소켓을 생성하여 return하는 함수
+
+int accept(
+int sock, //클라이언트의 접속을 수용하는 소켓
+struct sockaddr * addr, //소켓 구조체를 전달하면 클라이언트 주소 정보가 채워짐 (IP, port)
+socklen_t * addrlen //sockaddr에 클라이언트 정보가 채워진 바이트만큼 addrlen이 저장된다. 만약 클라이언트의 IP 주소와 포트 번호를 알 필요가 없다면 addr과 addrlen에 NULL값을 전달하면 됨 
+)
+
+접속한 클라이언트가 없을 경우 accpt() 함수는 대기 상태로 만들며 이때 서버의 CPU 사용률을 0%가 됨.
+클라이언트가 접속하면 서버는 깨어나고 accept함수를 return함
+
+
+//accept()
+int clientSock;
+struct sockaddr_in clinetAddr;
+socklen_t addrlen;
+
+while(1) {
+addrlen = sizeof(clientAddr);
+clientSock = accept(sock, (struct sockaddr *) &clientAddr, &addrlen);
 

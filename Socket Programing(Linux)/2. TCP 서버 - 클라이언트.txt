@@ -383,6 +383,8 @@ socklen_t addrlen //소켓 주소 구조체의 길이, 2번째 인자로 sockadd
 )
 
 
+//bind()
+struct sockaddr_in serverAddr;
 
 
 

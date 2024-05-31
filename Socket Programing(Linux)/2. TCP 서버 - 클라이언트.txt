@@ -104,7 +104,7 @@ if (sock == INVALID_SOCKET) {
 //bind()
 struct sockaddr_in serverAddr;
 memset(&serverAddr, 0, sizeof(serverAddr));
-//serverAddr의 모든 멤버를 0으로 초기화
+//serverAddr에 할당된 크기만큼 0으로 초기화(모든데이터를 0으로 뒤집어 쓴다)
 serverAddr.sin_family = AF_INET;
 serverAddr.sin_port = htons(SERVERPORT);
 serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -384,7 +384,46 @@ socklen_t addrlen //소켓 주소 구조체의 길이, 2번째 인자로 sockadd
 
 
 //bind()
-struct sockaddr_in serverAddr;
+struct sockaddr_in serverAddr;//로컬 주소를 저장할 구조체 변수 선언
+memset(&serverAddr, 0, sizeof(serveraddr)); //serverAddr의 size만큼 모든 값을 0으로 초기화
+serverAddr.sin.addr.s_addr = htonl(INADDR_ANY);//서버가 TCP 연결을 허용할 클라이언트의 IP로 사용되고 INADDR_ANY는 0.0.0.0(0)으로 설정하면 모든 TCP 연결 요청에 대해 어떤 클라이언트 IP가 와도 받을 수 있다.
+serverAddr.sin_port = htons(SERVERPORT);//서버의 port를 지정한다.
+retval = bind(sock, (struct sockaddr*)&serverAddr, sizeof(serverAddr));//
+//엥? 왜 2번째 인수 serverAdrr을 sockaddr로 형 변환하지?
+//bind 함수에서는 const struct sockaddr *로 인자를 받기 때문에 형 변환해줘야 한다.
+//엥? 근데 sockaddr과 sockaddr_in의 멤버가 다르잖아? 어떻게 해석할건데?
+//형 변환을 할때 sockaddr과 sockaddr_in의 첫번째 멤버는 각각 sa_family와 sin_family이다.
+//struct sockaddr_in은 struct sockaddr의 첫 멤버들이 동일하게 배열되어 있어서 호환이 가능하다.
+//sockaddr_in의 첫 멤버인 sin_family는 sockaddr의 sa_family와 동일한 위치에 있고, 
+// 따라서 캐스팅을 통해 두 구조체는 같은 메모리 레이아웃을 공유하게 된다.
+//그렇기에 아래와 같이 IP 주소 체계에 따라 다르게 로직을 수행한다.
+/*
+	int bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen) {
+		// 내부적으로는 addr->sa_family 값을 보고 어떤 주소 체계인지 확인
+		// addr->sa_family가 AF_INET이면, addr을 struct sockaddr_in으로 간주하고 처리
+		if (addr->sa_family == AF_INET) {
+			// IPv4 주소 체계 처리
+			const struct sockaddr_in* addr_in = (const struct sockaddr_in*)addr;
+			// addr_in을 사용하여 소켓을 바인딩
+		}
+		else if (addr->sa_family == AF_INET6) {
+			// IPv6 주소 체계 처리
+			const struct sockaddr_in6* addr_in6 = (const struct sockaddr_in6*)addr;
+			// addr_in6을 사용하여 소켓을 바인딩
+		}
+		// 다른 주소 체계 처리 ...
+	}
+*/
 
+
+
+
+
+3. listen(), TCP 상태를 listen으로 바꾸는 함수
+
+int listen(
+int sock,
+int backlog
+)
 
 

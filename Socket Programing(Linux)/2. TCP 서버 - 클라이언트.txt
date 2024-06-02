@@ -337,7 +337,7 @@ int main() {
 3) listen(): 소켓의 TCP 상태를 LISTENING으로 변경
 4) accept(): 클라이언트 접속을 수용하고, 접속한 클라이언트와 통신할 수 있는 새로운 소켓을 생성한다.
 이때 원격 IP 주소와 원격 포트가 결정됨
-5) send(), recv() 함수: 클라이언트와 데이터 통신 수행
+5) send(), recv() 함수: 클라이언트와 데이터 통신 수행 //클라이언트 
 6) close(): 소켓 닫기
 * 새로운 클라이언트 접속이 들어올 때마다 4~5 과정을 반복
 
@@ -455,4 +455,44 @@ socklen_t addrlen;
 while(1) {
 addrlen = sizeof(clientAddr);
 clientSock = accept(sock, (struct sockaddr *) &clientAddr, &addrlen);
+
+...
+}
+
+
+
+
+5. send(), recv() 함수는 클라이언트 코드 분석에서 다룬다.
+
+
+
+
+
+
+
+
+(2) TCP 클라이언트 함수 분석
+1. socket(): 소켓을 생성함으로써 사용할 프로토콜을 결정한다.
+2. connect(): 함수로 서버에 접속한다. 이때 원격 IP 주소와 원격 포트 번호는 물론, 지역 IP 주소와 지역 포트도 함께 결정된다.
+3. send(), recv() 함수: 데이터 전송함수로 서버와 통신한다.
+4. close(): 소켓을 닫는다.
+
+
+1. socket(), 소켓을 생성 (서버와 동일)
+
+
+
+
+2. connect(), TCP 프로토콜로 서버와 TCP 연결 수행
+
+int connect(
+int sock, //서버와 통신할 소켓
+const struct sockaddr * addr, //서버의 수조 정보를 초기화해서 전달
+int addrlen //소켓 주소 구조체의 길이
+); 
+
+
+
+
+
 

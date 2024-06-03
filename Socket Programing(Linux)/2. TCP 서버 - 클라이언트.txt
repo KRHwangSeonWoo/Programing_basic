@@ -487,7 +487,7 @@ clientSock = accept(sock, (struct sockaddr *) &clientAddr, &addrlen);
 
 int connect(
 int sock, //서버와 통신할 소켓
-const struct sockaddr * addr, //서버의 수조 정보를 초기화해서 전달
+const struct sockaddr * addr, //서버의 주소 정보를 초기화해서 전달
 int addrlen //소켓 주소 구조체의 길이
 ); 
 

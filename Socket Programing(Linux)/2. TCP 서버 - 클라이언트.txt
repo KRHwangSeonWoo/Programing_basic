@@ -440,7 +440,7 @@ retval = listen(sock, SOMAXCONN);
 int accept(
 int sock, //클라이언트의 접속을 수용하는 소켓
 struct sockaddr * addr, //소켓 구조체를 전달하면 클라이언트 주소 정보가 채워짐 (IP, port)
-socklen_t * addrlen //sockaddr에 클라이언트 정보가 채워진 바이트만큼 addrlen이 저장된다. 만약 클라이언트의 IP 주소와 포트 번호를 알 필요가 없다면 addr과 addrlen에 NULL값을 전달하면 됨 
+socklen_t * addrlen //초기에 addr의 크기로 초기화된 인자를 넣어야 하며, accept함수 로직 이후에는 addr에 클라이언트 정보가 채워진 바이트만큼 addrlen이 저장된다. 만약 클라이언트의 IP 주소와 포트 번호를 알 필요가 없다면 addr과 addrlen에 NULL값을 전달하면 됨 
 )
 
 접속한 클라이언트가 없을 경우 accpt() 함수는 대기 상태로 만들며 이때 서버의 CPU 사용률을 0%가 됨.

@@ -337,7 +337,7 @@ int main() {
 3) listen(): 소켓의 TCP 상태를 LISTENING으로 변경
 4) accept(): 클라이언트 접속을 수용하고, 접속한 클라이언트와 통신할 수 있는 새로운 소켓을 생성한다.
 이때 원격 IP 주소와 원격 포트가 결정됨
-5) send(), recv() 함수: 클라이언트와 데이터 통신 수행 //클라이언트 
+5) send(), recv() 함수: 클라이언트와 데이터 통신 수행
 6) close(): 소켓 닫기
 * 새로운 클라이언트 접속이 들어올 때마다 4~5 과정을 반복
 
@@ -460,9 +460,7 @@ clientSock = accept(sock, (struct sockaddr *) &clientAddr, &addrlen);
 }
 
 
-
-
-5. send(), recv() 함수는 클라이언트 코드 분석에서 다룬다.
+5. send(), recv() 함수는 다른 장에서 배운다.
 
 
 
@@ -498,4 +496,26 @@ connect() 함수: 클라이언트가 사전에 알고 있는 서버의 주소 �
 
 *일반적으로 서버와는 달리 클라이언트는 bind()를 호출하지 않는다. connect() 함수를 호출하면 OS가 자동적으로 지역 IP, port를 할당해준다.
 
- 
+//connect()
+struct sockaddr_in serverAddr;
+memset(&serverAddr, 0, sizeof(serverAddr));
+serverAddr.sin_family = AF_INET;
+inet_pton(AF_INET, SERVERIP, &serverAddr.sin_addr);
+serverAddr.sin_port = hitons(SERVERPORT);
+retval = connect(sock, (struct sockaddr * )&serverAddr, sizeof(serverAddr));
+
+
+
+
+
+
+
+
+
+(3) TCP 데이터 전송 함수
+데이터 전송함수는 데이터를 보내는 함수와 데이터를 받는 함수로 구분할 수 있다.
+가장 기본이되는 함수는 send(), recv() 함수가 있다. (UDP에서는 sendto(), recvfrom() 함수 존재)
+
+
+
+

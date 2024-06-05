@@ -431,10 +431,6 @@ socklen_t addrlen //소켓 주소 구조체의 길이, 2번째 인자로 sockadd
 
 
 //bind()
-struct sockaddr_in serverAddr;//로컬 주소를 저장할 구조체 변수 선언
-memset(&serverAddr, 0, sizeof(serveraddr)); //serverAddr의 size만큼 모든 값을 0으로 초기화
-serverAddr.sin.addr.s_addr = htonl(INADDR_ANY);//서버가 TCP 연결을 허용할 클라이언트의 IP로 사용되고 INADDR_ANY는 0.0.0.0(0)으로 설정하면 모든 TCP 연결 요청에 대해 어떤 클라이언트 IP가 와도 받을 수 있다.
-serverAddr.sin_port = htons(SERVERPORT);//서버의 port를 지정한다.
 retval = bind(sock, (struct sockaddr*)&serverAddr, sizeof(serverAddr));//
 //엥? 왜 2번째 인수 serverAdrr을 sockaddr로 형 변환하지?
 //bind 함수에서는 const struct sockaddr *로 인자를 받기 때문에 형 변환해줘야 한다.
@@ -495,16 +491,8 @@ socklen_t * addrlen //초기에 addr의 크기로 초기화된 인자를 넣어�
 
 
 //accept()
-int clientSock;
-struct sockaddr_in clinetAddr;
-socklen_t addrlen;
-
-while(1) {
-addrlen = sizeof(clientAddr);
 clientSock = accept(sock, (struct sockaddr *) &clientAddr, &addrlen);
 
-...
-}
 
 
 5. send(), recv() 함수는 다른 장에서 배운다.
@@ -568,11 +556,6 @@ connect() 함수: 클라이언트가 사전에 알고 있는 서버의 주소 �
 *일반적으로 서버와는 달리 클라이언트는 bind()를 호출하지 않는다. connect() 함수를 호출하면 OS가 자동적으로 지역 IP, port를 할당해준다.
 
 //connect()
-struct sockaddr_in serverAddr;
-memset(&serverAddr, 0, sizeof(serverAddr));
-serverAddr.sin_family = AF_INET;
-inet_pton(AF_INET, SERVERIP, &serverAddr.sin_addr);
-serverAddr.sin_port = hitons(SERVERPORT);
 retval = connect(sock, (struct sockaddr * )&serverAddr, sizeof(serverAddr));
 
 

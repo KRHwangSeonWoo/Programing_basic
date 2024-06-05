@@ -4,7 +4,7 @@
 1. TCP 서버 - 클라이언트 핵심 동작 과정
 
 1) 서버는 클라이언트가 접속하기를 기다림 (listen)
-2) 클라이언트는 서버에 접속 (connect)하고, 서버는 이 접속을 수용함 (accept)
+2) 클라이언트는 서버에 접속 (connect)하고, 서버는 이 접속을 수용함 (accept
 3) 클라이언트는 서버에 데이터를 보내고 (send), 서버는 클라이언트가 보낸 데이터를 받아 처리함 (recv)
 4) 서버는 처리한 데이터를 클라이언트에 보냄 (send)
 5) 클라이언트는 서버가 보낸 데이터를 받아 처리함 (recv)
@@ -416,7 +416,8 @@ UDP = IPPROTO_UDP
 int bind(
 int sock, //클라이언트 접속을 수용하는 소켓 (TCP 세션을 맺는 소켓 지정)
 const struct sockaddr * addr, //지역 IP 주소와 지역 포트를 초기화
-socklen_t addrlen //소켓 주소 구조체의 길이, 2번째 인자로 sockaddr을 받기에 struct sockaddr_in인지(IPv4), struct sockaddr_in6(IPv6)인지 모른다. 그렇기에 안전하게 메모리를 할당하여 사용하기 위해서 (구조체 마다 할당되는 메모리 크기가 다르기에) 해당 구조체의 바이트 크기를 인자로 받는것이다.
+socklen_t addrlen //소켓 주소 구조체의 길이, 2번째 인자로 소켓 구조체를 받는다. 여기서 소켓을 생성할 IP 주소 체계가 struct sockaddr_in인지(IPv4), struct sockaddr_in6(IPv6)인지 모른다.
+그렇기에 안전하게 메모리를 할당하여 사용하기 위해서 (구조체 마다 할당되는 메모리 크기가 다르기에) 해당 구조체의 바이트 크기를 인자로 받는것이다.
 )
 
 
